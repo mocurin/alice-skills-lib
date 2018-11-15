@@ -1,6 +1,7 @@
 #include <functional>
 #include <iostream>
 #include <string>
+#include <boost/system/error_code.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/version.hpp>
@@ -23,7 +24,7 @@ struct send_lambda
 		send_lambda(
 			Stream& stream,
 			bool& close,
-			boost::system::error_code& ec)
+            boost::system::error_code& ec)
 		: stream_(stream)
 		, close_(close)
 		, ec_(ec)
@@ -44,7 +45,6 @@ struct Skill {
 		class Body, class Allocator,
 		class Send>
 		void handle_request(
-			boost::beast::string_view doc_root,
 			http::request<Body, http::basic_fields<Allocator>>&& req,
 			Send&& send)
 	{
@@ -61,7 +61,7 @@ struct Skill {
 	}
 	void setCallback(std::function<void(const std::string& request,
 		std::string& response)> callback) {
-		callback_ = callback;
+		callback_ = std::move(callback);
 	}
 	void run() {
 auto const address = boost::asio::ip::make_address("0.0.0.0");
@@ -77,10 +77,11 @@ auto const address = boost::asio::ip::make_address("0.0.0.0");
 			// Block until we get a connection
 			acceptor_.accept(socket_);
 			// Launch the session, transferring ownership of the socket
-			std::thread{ std::bind(
+			std::thread{ //std::bind(
 				&Skill::do_session,
+                this,
 				std::move(socket_),
-				doc_root_) }.detach();
+				doc_root_ }.detach();
 		}
 	}
 private:
@@ -88,7 +89,7 @@ private:
 		callback_;
 	void
 		do_session(
-			tcp::socket& socket,
+			tcp::socket&& socket,
 			std::shared_ptr<std::string const> const& doc_root)
 	{
 		bool close = false;
@@ -103,7 +104,7 @@ private:
 				break;
 			if (ec)
 				return fail(ec, "read");
-			handle_request(*doc_root, std::move(req), lambda);
+			handle_request(std::move(req), lambda);
 			if (ec)
 				return fail(ec, "write");
 			if (close)
