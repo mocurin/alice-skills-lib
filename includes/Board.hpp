@@ -31,8 +31,6 @@ private:
 
 // Returns true if position is proper for ship placement. Is used in both random generation and manual placing.
     bool Check(const tile* pos);
-// Returns true if health of named ship equals to 0.
-    bool IsDead(const std::string& name);
 
 // Random generation and ship building.
 
@@ -51,8 +49,6 @@ private:
 
 // Returns size of ship with beginning in spos and end in epos. Returns 0 if poss are not on the same line.
     size_t Size(const tile* spos, const tile* epos);
-// Returns name of the ship with a named tile. Otherwise returns empty string.
-    std::string GetShipName(const tile* pos);
 // Returns amount of same sized ships in positions_. Is used in maual placing.
     size_t Amount(const size_t& size);
 
@@ -73,9 +69,9 @@ public:
 
 // GeneratesRandom battlefield;
     void RandomScenario();
-// Returns true if shot hits or pos is invalid, false if shot misses; !COUTs!
+// Returns true if shot hits or pos is invalid, false if shot misses;
     bool Shoot(const tile& pos);
-// Manual placing for ships of any size (<5); Returns false if ship cannot be placed. !COUTs!
+// Manual placing for ships of any size (<5); Returns false if ship cannot be placed.
     bool Place(const tile& spos, const tile& epos);
 
 // Show functions
@@ -88,8 +84,10 @@ public:
     void ShowTargeted(const tile& pos);
 // Shows status. Is not currently used.
     void ShowStatus();
-// Returns player name;
+// Returns player name.
     std::string GetName();
+// Returns name of the ship with a named tile. Otherwise returns empty string.
+    std::string GetShipName(const tile* pos);
 
 // Public checks
 
@@ -101,6 +99,8 @@ public:
     bool IsLooser();
 // Returns true if all ships are placed (if there are 10 ships).
     bool IsFull();
+// Returns true if health of named ship equals to 0.
+    bool IsDead(const std::string& name);
 
 // AI
 
@@ -108,4 +108,15 @@ public:
     std::pair<std::vector<tile>, size_t> ShootRand();
 // Randomly chooses position from vector. Can continue seeking after a miss.
     std::pair<std::vector<tile>, size_t> ContinueShooting(std::vector<tile>& positions, size_t& hits);
+
+// V2: Alicization
+
+// Returns std::strings to be used by Alice
+    std::string MyBoardToString();
+    std::string EnemyBoardToString();
+    std::string TargetedToString(const tile& pos);
+    std::string StatusToString();
+    std::string ComplexCheck(const tile& spos, const tile& epos);
+// Returms total amount of ship health. Can be used in tracking
+    size_t TotalHealth();
 };

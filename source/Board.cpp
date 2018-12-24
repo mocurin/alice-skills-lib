@@ -1,4 +1,4 @@
-#include "Board.h"
+#include "Board.hpp"
 
 Board::Board(std::string name)
 {
@@ -106,6 +106,89 @@ void Board::ShowEnemyBoard()
         std::cout << std::endl;
     }
     std::cout << std::endl;
+}
+
+std::string Board::MyBoardToString()
+{
+    std::string matrix;
+    for (char i = '0'; i <= '9'; ++i)
+    {
+        if (i == 0)
+        {
+            matrix += 'N';
+            for (char j = '0'; j <= '9'; ++j)
+            {
+                matrix += ' ';
+                matrix += j;
+            }
+            matrix += '\n';
+        }
+        matrix += i;
+        for (char j = '0'; j <= '9'; ++j)
+        {
+            matrix += ' ';
+            matrix += clear_[i][j];
+        }
+        matrix += '\n';
+    }
+    return matrix;
+}
+
+std::string Board::TargetedToString(const tile& pos)
+{
+    std::string matrix;
+    for (char i = '0'; i <= '9'; ++i)
+    {
+        if (i == 0)
+        {
+            matrix += 'N';
+            for (char j = '0'; j <= '9'; ++j)
+            {
+                matrix += ' ';
+                matrix += j;
+            }
+            matrix += '\n';
+        }
+        matrix += i;
+        for (char j = '0'; j <= '9'; ++j)
+        {
+            if (pos.first == j && pos.second == i)
+            {
+                matrix += " T";
+                continue;
+            }
+            matrix += ' ';
+            matrix += clear_[i][j];
+        }
+        matrix += '\n';
+    }
+    return matrix;
+}
+
+std::string Board::EnemyBoardToString()
+{
+    std::string matrix;
+    for (char i = '0'; i <= '9'; ++i)
+    {
+        if (i == 0)
+        {
+            matrix += 'N';
+            for (char j = '0'; j <= '9'; ++j)
+            {
+                matrix += ' ';
+                matrix += j;
+            }
+            matrix += '\n';
+        }
+        matrix += i;
+        for (char j = '0'; i <= '9'; ++j)
+        {
+            matrix += ' ';
+            matrix += cloudy_[i][j];
+        }
+        matrix += '\n';
+    }
+    return matrix;
 }
 
 bool Board::Check(const tile* pos)
@@ -332,10 +415,9 @@ void Board::MarkShip(const std::string& name)
     }
 }
 
-
 void Board::Destroy(const std::string& name)
 {
-    auto pair = std::make_pair(0u, 0u);
+    tile pair = std::make_pair(0u, 0u);
     tile* target = &pair;
 // First point
     for (size_t times = 0; times < 3; ++times)
@@ -363,7 +445,7 @@ void Board::Destroy(const std::string& name)
                 continue;
             target->second = positions_[name][last].second - 1;
             if (target->second < 10)
-                    cloudy_[target->second][target->first] = 'x';
+                cloudy_[target->second][target->first] = 'x';
             ++(target->second);
             cloudy_[target->second][target->first] = 'x';
             ++(target->second);
@@ -426,6 +508,29 @@ void Board::ShowStatus()
     std::cout << std::endl;
 }
 
+std::string Board::StatusToString()
+{
+    std::string text;
+    std::string name = "a";
+    char edge = 'e';
+    do
+    {
+        text += name;
+        text += ' ';
+        text += static_cast<bool>(status_[name]);
+        text += '\n';
+        ++name[name.size() - 1];
+        if (name[name.size() - 1] == edge)
+        {
+            name[name.size() - 1] = 'a';
+            name = name + 'a';
+            --edge;
+        }
+    } while (edge != 'a');
+    text += '\n';
+    return text;
+}
+
 bool Board::WasShot(const tile& pos)
 {
     return cloudy_[pos.second][pos.first] != '~';
@@ -440,20 +545,17 @@ bool Board::Shoot(const tile& pos)
 {
     if (clear_[pos.second][pos.first] == 'X')
     {
-        std::cout << "Hit!" << std::endl;
         auto name = GetShipName(&pos);
         --status_[name];
         cloudy_[pos.second][pos.first] = 'S';
         if (IsDead(name))
         {
-            std::cout << "Ship is destroyed!" << std::endl;
             Destroy(name);
         }
         return true;
     }
     else
     {
-        std::cout << "Miss!" << std::endl;
         cloudy_[pos.second][pos.first] = 'x';
         return false;
     }
@@ -480,24 +582,32 @@ size_t Board::Amount(const size_t& size)
     return amount;
 }
 
-bool Board::Place(const tile& spos, const tile& epos)
+std::string Board::ComplexCheck(const tile& spos, const tile& epos)
 {
-// Check 
+    std::string error_text;
     auto size = Size(&spos, &epos);
     if (!Check(&spos) || !Check(&epos) || size == 0 || size > 4)
     {
-        std::cout << "Invalid positions" << std::endl;
-        return false;
+        error_text += "Неподходящая позиция\n";
+        return error_text;
     }
     auto edge = 5u;
     auto amount = Amount(size);
     if (amount >= edge - size)
     {
-        std::cout << "There is enough " << size << "-sized ships" << std::endl;
-        return false;
+        error_text += "Достаточно ";
+        error_text += size;
+        error_text += "-палубных кораблей\n";
+        return error_text;
     }
+    return error_text;
+}
+
+bool Board::Place(const tile& spos, const tile& epos)
+{
+    auto size = Size(&spos, &epos);
+    auto amount = Amount(size);
     std::string name = "";
-// Placing
     for (size_t i = 0; i < size - 1; ++i)
     {
         name += 'a';
@@ -616,13 +726,23 @@ std::pair<std::vector<tile>, size_t> Board::ShootRand()
         if (IsDead(GetShipName(&pos)))
             return ShootRand();
         auto possible = GeneratePossible(pos);
-        auto hits = 1u;
+        size_t hits = 1;
         return ContinueShooting(possible, hits);
     }
     else 
     {
         std::vector <tile> possible;
-        auto hits = 0u;
+        size_t hits = 0;
         return { possible, hits };
     }
+}
+
+size_t Board::TotalHealth()
+{
+    size_t total = 0;
+    for (const auto& i : status_)
+    {
+        total += i.second;
+    }
+    return total;
 }
