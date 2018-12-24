@@ -1,6 +1,9 @@
 os: linux
-sudo: false
+sudo: required
 language: cpp
+
+services:
+ - docker
 
 addons:
   apt:
@@ -22,18 +25,25 @@ before_install:
 - export CXX=$CXX_EVAL
 - export CC=$CC_EVAL
 - pip install --user cpplint
+# - docker build -t alice_heroku . 
+# - docker login -u $DOCKER_USER -p $DOCKER_PASS -e $DOCKER_EMAIL
+# - docker push alice_heroku .
 
 script:
 - files=`find . -name "*.cpp" -or -name "*.hpp" -or -name ".h" | grep -v "./tools/*"`
 # sanitaizer check
-#- ( for file in $files; do cpplint --filter=-whitespace/ending_newline,-whitespace/blank_line,-readability/utf8,-whitespace/empty_loop_body,-whitespace/braces,-whitespace/line_length,-legal/copyright,-whitespace/newline,-runtime/references,-whitespace/indent,-whitespace/comments $file || exit; done );
-- ./tools/polly/bin/polly --reconfig --toolchain sanitize-address --config Release --fwd CMAKE_EXE_LINKER="-fuse-ld=gold"
+# - ./tools/polly/bin/polly --reconfig --toolchain sanitize-address --config Release --fwd CMAKE_EXE_LINKER="-fuse-ld=gold"
 # clang-check
-- ./tools/polly/bin/polly --reconfig --config Release --fwd CMAKE_EXE_LINKER="-fuse-ld=gold" CMAKE_EXPORT_COMPILE_COMMANDS=ON
-- ( for file in $files; do echo $file; clang-check -analyze $file -p _builds/default-Release || exit; done );
+# - ./tools/polly/bin/polly --reconfig --config Release --fwd CMAKE_EXE_LINKER="-fuse-ld=gold" CMAKE_EXPORT_COMPILE_COMMANDS=ON
 # tests
 - export CTEST_OUTPUT_ON_FAILURE=true
-- ./tools/polly/bin/polly --reconfig --test --config Release --fwd CMAKE_EXE_LINKER="-fuse-ld=gold"
+# - ./tools/polly/bin/polly --reconfig --test --config Release --fwd CMAKE_EXE_LINKER="-fuse-ld=gold"
+
+
+after_success:
+  - heroku container:login
+  - heroku container:push web -a $HEROKU_APP_NAME
+  - heroku container:release web -a $HEROKU_APP_NAME
 
 notifications:
   email: false
