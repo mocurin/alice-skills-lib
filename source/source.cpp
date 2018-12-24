@@ -171,7 +171,7 @@ void MyCallback(const Alice::Request& request, Alice::Response& response)
 int main()
 {
     Skill battleships;
-    battleships.setCallback(MyCallback);
-    battleships.run();
+    battleships.SetCallback(MyCallback);
+    battleships.Run();
     return 0;
 }
