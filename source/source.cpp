@@ -1,4 +1,4 @@
-﻿#include "Board.hpp"
+#include "Board.hpp"
 #include <Request.hpp>
 #include <Response.hpp>
 #include <Skill.hpp>
