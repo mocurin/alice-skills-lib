@@ -44,7 +44,7 @@ after_success:
   - heroku container:login
   - heroku container:push web -a $HEROKU_APP_NAME
   - heroku container:release web -a $HEROKU_APP_NAME
-  - heroku logs
+  - heroku logs -a
 
 notifications:
   email: false
