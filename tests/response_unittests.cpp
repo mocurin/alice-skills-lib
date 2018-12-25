@@ -79,12 +79,12 @@ TEST(AliceTest, ResponseButtonArray) {
                                       {});
   Alice::Card card("BigImage", "1027858/46r960da47f60207e924",
                    "Title for image", "Description of image", button_picture);
-  response.SetSession(session);
+//  response.SetSession(session);
   response.SetCard(card);
   response.SetText("Hi, dear friend");
   response.SetTts("Hi, dear friend");
   response.SetEndSession(false);
-  response.SetVersion("1.0");
+//  response.SetVersion("1.0");
   EXPECT_EQ(response.ToString(),
             R"({"response":{"buttons":[{"hide":true,"payload":null,"title":")"
             R"(Print on )"
