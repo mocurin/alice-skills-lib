@@ -34,8 +34,6 @@ add_executable(alice_tests
   source/Button.cpp
   source/Card.cpp
   source/ButtonPicture.cpp
-  source/source.cpp
-
   source/Board.cpp
   tests/request_unittests.cpp
   tests/response_unittests.cpp
@@ -49,10 +47,8 @@ add_executable(websocket-chat-server
   source/Button.cpp
   source/Card.cpp
   source/ButtonPicture.cpp
-  source/main.cpp
-  source/source.cpp
-
   source/Board.cpp
+  source/source.cpp
 )
 
 target_include_directories(alice_tests PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/includes)
@@ -63,4 +59,3 @@ target_link_libraries(websocket-chat-server nlohmann_json::nlohmann_json Boost::
 
 enable_testing()
 add_test(NAME tests COMMAND alice_tests)
-
