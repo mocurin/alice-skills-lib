@@ -26,7 +26,8 @@ private:
     std::map<std::string, tile*> positions_;
 // Indicates status of all battleships. Ships with 0 health are deleted by Destroy().
     std::map<std::string, size_t> status_;
-
+// As there are lots of random elements i have to make one rd gen to use all the time;
+    std::mt19937 gen_;
 // Private checks.
 
 // Returns true if position is proper for ship placement. Is used in both random generation and manual placing.
@@ -88,6 +89,12 @@ public:
     std::string GetName();
 // Returns name of the ship with a named tile. Otherwise returns empty string.
     std::string GetShipName(const tile* pos);
+// Returns random generator. 
+    std::mt19937 GetRdGen();
+// Returns amount of ships in positions_.
+    size_t ShipsAmount();
+// Returms total amount of ship health
+    size_t TotalHealth();
 
 // Public checks
 
@@ -95,10 +102,6 @@ public:
     bool WasShot(const tile& pos);
 // Returns true is tile is inside matrix bounds.
     bool IsProper(const tile& pos);
-// Returns true if there is no ships left in status_.
-    bool IsLooser();
-// Returns true if all ships are placed (if there are 10 ships).
-    bool IsFull();
 // Returns true if health of named ship equals to 0.
     bool IsDead(const std::string& name);
 
@@ -109,14 +112,10 @@ public:
 // Randomly chooses position from vector. Can continue seeking after a miss.
     std::pair<std::vector<tile>, size_t> ContinueShooting(std::vector<tile>& positions, size_t& hits);
 
-// V2: Alicization
-
 // Returns std::strings to be used by Alice
     std::string MyBoardToString();
     std::string EnemyBoardToString();
     std::string TargetedToString(const tile& pos);
     std::string StatusToString();
     std::string ComplexCheck(const tile& spos, const tile& epos);
-// Returms total amount of ship health. Can be used in tracking
-    size_t TotalHealth();
 };

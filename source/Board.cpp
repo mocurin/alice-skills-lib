@@ -3,20 +3,45 @@
 Board::Board(std::string name)
 {
     name_ = name;
-    char** first = new char*[10];
-    char** second = new char*[10];
-    for (size_t i = 0; i < 10; ++i)
+    char** first = new char*[11];
+    char** second = new char*[11];
+    char ch = 'A';
+    for (size_t i = 0; i < 11; ++i)
     {
-        first[i] = new char[10];
-        second[i] = new char[10];
-        for (size_t j = 0; j < 10; ++j)
+        first[i] = new char[11];
+        second[i] = new char[11];
+        for (size_t j = 0; j < 11; ++j)
         {
-            first[i][j] = '~';
-            second[i][j] = '~';
+            if (i == 0 && j == 0)
+            {
+                first[i][j] = 'N';
+                second[i][j] = 'N';
+            }
+            else if (i == 0)
+            {
+                first[i][j] = ch;
+                second[i][j] = ch;
+                ++ch;
+                if (j == 10)
+                    ch = 'A';
+            }
+            else if (j == 0)
+            {
+                first[i][j] = ch;
+                second[i][j] = ch;
+                ++ch;
+            }
+            else
+            {
+                first[i][j] = '~';
+                second[i][j] = '~';
+            }
         }
     }
     clear_ = first;
     cloudy_ = second;
+    std::mt19937 ngen(time(0));
+    gen_ = ngen;
 }
 
 Board::Board() : Board("Player")
@@ -25,7 +50,7 @@ Board::Board() : Board("Player")
 
 Board::~Board()
 {
-    for (size_t i = 0; i < 10; ++i)
+    for (size_t i = 0; i < 11; ++i)
     {
         delete[] clear_[i];
         delete[] cloudy_[i];
@@ -36,7 +61,6 @@ Board::~Board()
     {
         delete[] i.second;
     }
-
 }
 
 std::string Board::GetName()
@@ -46,17 +70,9 @@ std::string Board::GetName()
 
 void Board::ShowMyBoard()
 {
-    for (size_t i = 0; i < 10; ++i)
+    for (size_t i = 0; i < 11; ++i)
     {
-        if (i == 0)
-        {
-            std::cout << 'N';
-            for (size_t j = 0; j < 10; ++j)
-                std::cout << ' ' << j;
-            std::cout << std::endl;
-        }
-        std::cout << i;
-        for (size_t j = 0; j < 10; ++j)
+        for (size_t j = 0; j < 11; ++j)
             std::cout << ' ' << clear_[i][j];
         std::cout << std::endl;
     }
@@ -65,24 +81,14 @@ void Board::ShowMyBoard()
 
 void Board::ShowTargeted(const tile& pos)
 {
-    for (size_t i = 0; i < 10; ++i)
+    for (size_t i = 0; i < 11; ++i)
     {
-        if (i == 0)
-        {
-            std::cout << 'N';
-            for (size_t j = 0; j < 10; ++j)
-                std::cout << ' ' << j;
-            std::cout << std::endl;
-        }
-        std::cout << i;
-        for (size_t j = 0; j < 10; ++j)
+        for (size_t j = 0; j < 11; ++j)
         {
             if (pos.first == j && pos.second == i)
-            {
                 std::cout << " T";
-                continue;
-            }
-            std::cout << ' ' << clear_[i][j];
+            else
+                std::cout << ' ' << clear_[i][j];
         }
         std::cout << std::endl;
     }
@@ -91,17 +97,9 @@ void Board::ShowTargeted(const tile& pos)
 
 void Board::ShowEnemyBoard()
 {
-    for (size_t i = 0; i < 10; ++i)
+    for (size_t i = 0; i < 11; ++i)
     {
-        if (i == 0)
-        {
-            std::cout << 'N';
-            for (size_t j = 0; j < 10; ++j)
-                std::cout << ' ' << j;
-            std::cout << std::endl;
-        }
-        std::cout << i;
-        for (size_t j = 0; j < 10; ++j)
+        for (size_t j = 0; j < 11; ++j)
             std::cout << ' ' << cloudy_[i][j];
         std::cout << std::endl;
     }
@@ -111,83 +109,44 @@ void Board::ShowEnemyBoard()
 std::string Board::MyBoardToString()
 {
     std::string matrix;
-    for (char i = '0'; i <= '9'; ++i)
+    for (size_t i = 0; i < 11; ++i)
     {
-        if (i == 0)
-        {
-            matrix += 'N';
-            for (char j = '0'; j <= '9'; ++j)
-            {
-                matrix += ' ';
-                matrix += j;
-            }
-            matrix += '\n';
-        }
-        matrix += i;
-        for (char j = '0'; j <= '9'; ++j)
-        {
-            matrix += ' ';
-            matrix += clear_[i][j];
-        }
+        for (size_t j = 0; j < 11; ++j)
+            matrix += ' ' + clear_[i][j];
         matrix += '\n';
     }
+    matrix += '\n';
     return matrix;
 }
 
 std::string Board::TargetedToString(const tile& pos)
 {
     std::string matrix;
-    for (char i = '0'; i <= '9'; ++i)
+    for (size_t i = 0; i < 11; ++i)
     {
-        if (i == 0)
-        {
-            matrix += 'N';
-            for (char j = '0'; j <= '9'; ++j)
-            {
-                matrix += ' ';
-                matrix += j;
-            }
-            matrix += '\n';
-        }
-        matrix += i;
-        for (char j = '0'; j <= '9'; ++j)
+        for (size_t j = 0; j < 11; ++j)
         {
             if (pos.first == j && pos.second == i)
-            {
                 matrix += " T";
-                continue;
-            }
-            matrix += ' ';
-            matrix += clear_[i][j];
+            else
+                matrix += ' ' + clear_[i][j];
         }
         matrix += '\n';
     }
+    matrix += '\n';
     return matrix;
 }
 
 std::string Board::EnemyBoardToString()
 {
     std::string matrix;
-    for (char i = '0'; i <= '9'; ++i)
+    for (size_t i = 0; i < 11; ++i)
     {
-        if (i == 0)
-        {
-            matrix += 'N';
-            for (char j = '0'; j <= '9'; ++j)
-            {
-                matrix += ' ';
-                matrix += j;
-            }
-            matrix += '\n';
-        }
-        matrix += i;
-        for (char j = '0'; i <= '9'; ++j)
-        {
-            matrix += ' ';
-            matrix += cloudy_[i][j];
-        }
+        for (size_t j = 0; j < 11; ++j)
+            matrix += ' ' + cloudy_[i][j];
         matrix += '\n';
     }
+    matrix += '\n';
     return matrix;
 }
 
@@ -213,12 +172,11 @@ bool Board::Check(const tile* pos)
 
 tile* Board::PickRand()
 {
-    std::mt19937 gen(time(0));
-    std::uniform_int_distribution<> directions(0, 9);
+    std::uniform_int_distribution<> row(1, 10);
     auto* pos = new tile;
-    *pos = { directions(gen), directions(gen) };
+    *pos = { row(gen_), row(gen_) };
     while (!Check(pos))
-        *pos = { directions(gen), directions(gen) };
+        *pos = { row(gen_), row(gen_) };
     return pos;
 }
 
@@ -226,11 +184,8 @@ tile* Board::ThrowRand(const tile* prev, const size_t& jump)
 { 
     auto* thrown = new tile;
     auto k = 0u;
-    {
-        std::mt19937 gen(time(0));
-        std::uniform_int_distribution<> directions(0, 3);
-        k = directions(gen);
-    }
+    std::uniform_int_distribution<> directions(0, 3);
+    k = directions(gen_);
     for (size_t i = 0; i < 4; ++i)
     {
         switch (k)
@@ -417,40 +372,42 @@ void Board::MarkShip(const std::string& name)
 
 void Board::Destroy(const std::string& name)
 {
-    tile pair = std::make_pair(0u, 0u);
-    tile* target = &pair;
-// First point
+    tile pair = { 0, 0 };
+    // First point
     for (size_t times = 0; times < 3; ++times)
     {
-        target->first = positions_[name][0].first - 1 + times;
-        if (target->first > 9)
+        pair.first = positions_[name][0].first - 1 + times;
+        // Checks if Y is out of borders
+        if (pair.first < 1 || pair.first > 10)
             continue;
-        target->second = positions_[name][0].second - 1;
-        if (target->second < 10)
-            cloudy_[target->second][target->first] = 'x';
-        ++(target->second);
-        cloudy_[target->second][target->first] = 'x';
-        ++(target->second);
-        if (target->second < 10)
-            cloudy_[target->second][target->first] = 'x';
+        pair.second = positions_[name][0].second - 1;
+        // Checks if X is out of borders
+        if (pair.second > 0 && pair.second < 11)
+            cloudy_[pair.second][pair.first] = 'x';
+        ++(pair.second);
+        // If the row wasnt thrown out in the beiginnig middle position should always be OK, therefore no checks are needed;
+        cloudy_[pair.second][pair.first] = 'x';
+        ++(pair.second);
+        if (pair.second > 0 && pair.second < 11)
+            cloudy_[pair.second][pair.first] = 'x';
     }
-// Last point
+    // Last point. Literally the same way as the first. Happens only if ship isn`t 1 sized
     if (name.size() != 1)
     {
-        const auto last = name.size() - 1;
+        const size_t last = name.size() - 1;
         for (size_t times = 0; times < 3; ++times)
         {
-            target->first = positions_[name][last].first - 1 + times;
-            if (target->first > 9)
+            pair.first = positions_[name][last].first - 1 + times;
+            if (pair.first < 1 || pair.first > 10)
                 continue;
-            target->second = positions_[name][last].second - 1;
-            if (target->second < 10)
-                cloudy_[target->second][target->first] = 'x';
-            ++(target->second);
-            cloudy_[target->second][target->first] = 'x';
-            ++(target->second);
-            if (target->second < 10)
-                cloudy_[target->second][target->first] = 'x';
+            pair.second = positions_[name][last].second - 1;
+            if (pair.second > 0 && pair.second < 11)
+                cloudy_[pair.second][pair.first] = 'x';
+            ++(pair.second);
+            cloudy_[pair.second][pair.first] = 'x';
+            ++(pair.second);
+            if (pair.second > 0 && pair.second < 11)
+                cloudy_[pair.second][pair.first] = 'x';
         }
     }
     for (size_t i = 0; i < name.size(); ++i)
@@ -538,7 +495,7 @@ bool Board::WasShot(const tile& pos)
 
 bool Board::IsProper(const tile& pos)
 {
-    return pos.second < 10 && pos.first < 10;
+    return pos.second < 11 && pos.second > 0 && pos.first < 11 && pos.first > 0;
 }
 
 bool Board::Shoot(const tile& pos)
@@ -561,14 +518,9 @@ bool Board::Shoot(const tile& pos)
     }
 }
 
-bool Board::IsLooser()
+size_t Board::ShipsAmount()
 {
-    return positions_.empty();
-}
-
-bool Board::IsFull()
-{
-    return positions_.size() == 10u;
+    return positions_.size();
 }
 
 size_t Board::Amount(const size_t& size)
@@ -607,7 +559,7 @@ bool Board::Place(const tile& spos, const tile& epos)
 {
     auto size = Size(&spos, &epos);
     auto amount = Amount(size);
-    std::string name = "";
+    std::string name;
     for (size_t i = 0; i < size - 1; ++i)
     {
         name += 'a';
@@ -622,16 +574,16 @@ bool Board::Place(const tile& spos, const tile& epos)
 std::vector<tile> Board::GeneratePossible(const tile& pos)
 {
     std::vector<tile> possible = { pos };
-    if (pos.second - 1 < 10u )
+    if (pos.second - 1 > 0u)
         if (!WasShot({ pos.first, pos.second - 1 }))
             possible.push_back({ pos.first, pos.second - 1 });
-    if (pos.first - 1 < 10u)
+    if (pos.first - 1 > 0u)
         if (!WasShot({ pos.first - 1, pos.second }))
             possible.push_back({ pos.first - 1, pos.second });
-    if (pos.second + 1 < 10u)
+    if (pos.second + 1 < 11u)
         if (!WasShot({ pos.first, pos.second + 1 }))
             possible.push_back({ pos.first, pos.second + 1 });
-    if (pos.first + 1 < 10u)
+    if (pos.first + 1 < 11u)
         if (!WasShot({ pos.first + 1, pos.second }))
             possible.push_back({ pos.first + 1, pos.second });
     return possible;
@@ -642,13 +594,14 @@ std::pair<std::vector<tile>, size_t> Board::ContinueShooting(std::vector<tile>& 
     size_t num = positions.size() - 1;
     if (num != hits)
     {
-        std::mt19937 gen(time(0));
         std::uniform_int_distribution<> directions(hits, num);
-        num = directions(gen);
+        num = directions(gen_);
     }
+    auto name = GetShipName(&positions[num]);
+    std::vector<tile> copy;
     if (Shoot(positions[num]))
     {
-        if (IsDead(GetShipName(&positions[num])))
+        if (IsDead(name))
         {
             positions.clear();
             hits = 0;
@@ -704,7 +657,7 @@ std::pair<std::vector<tile>, size_t> Board::ContinueShooting(std::vector<tile>& 
             return ContinueShooting(copy, hits);
         }
     }
-    auto copy = positions;
+    copy = positions;
     std::swap(copy.back(), copy[num]);
     copy.pop_back();
     return { copy, hits };
@@ -713,13 +666,10 @@ std::pair<std::vector<tile>, size_t> Board::ContinueShooting(std::vector<tile>& 
 std::pair<std::vector<tile>, size_t> Board::ShootRand()
 {
     tile pos;
-    {
-        std::mt19937 gen(time(0));
-        std::uniform_int_distribution<> row(0, 9);
-        pos = { row(gen), row(gen) };
-        while (WasShot(pos))
-            pos = { row(gen), row(gen) };
-    }
+    std::uniform_int_distribution<> row(1, 10);
+    pos = { row(gen_), row(gen_) };
+    while (WasShot(pos))
+        pos = { row(gen_), row(gen_) };
     std::vector <tile> possible;
     if (Shoot(pos))
     {
@@ -745,4 +695,9 @@ size_t Board::TotalHealth()
         total += i.second;
     }
     return total;
+}
+
+std::mt19937 Board::GetRdGen()
+{
+    return gen_;
 }
