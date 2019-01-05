@@ -75,7 +75,7 @@ bool IsShot(Board& Player, Alice::Response& response, const std::pair<size_t, si
     return false;
 }
 
-std::string ChooseRandomString(const std::mt19937& gen, std::vector<std::string>& replics)
+std::string ChooseRandomString(std::mt19937& gen, const std::vector<std::string>& replics)
 {
     std::uniform_int_distribution<> directions(0, replics.size() - 1);
     auto num = directions(gen);
