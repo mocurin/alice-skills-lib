@@ -75,11 +75,11 @@ bool IsShot(Board& Player, Alice::Response& response, const std::pair<size_t, si
     return false;
 }
 
-std::string ChooseRandomString(const std::mt19937& gen, const std::vector<std::string>& quotes)
+std::string ChooseRandomString(const std::mt19937& gen, std::vector<std::string>& replics)
 {
-    std::uniform_int_distribution<> directions(0, quotes.size() - 1);
+    std::uniform_int_distribution<> directions(0, replics.size() - 1);
     auto num = directions(gen);
-    return quotes[num];
+    return replics[num];
 }
 
 void MyCallback(const Alice::Request& request, Alice::Response& response)
@@ -200,7 +200,7 @@ void MyCallback(const Alice::Request& request, Alice::Response& response)
                             response.SetTts(tmp);
                         } while (true);
                     } while (!IsPlaced(Player, response, pos1, pos2));
-                } while (!Player.ShipsAmount() == 10);
+                } while (!(Player.ShipsAmount() == 10));
                 break;
             case 2:
                 tmp = ChooseRandomString(gen,
