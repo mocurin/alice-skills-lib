@@ -35,6 +35,7 @@ add_executable(alice_tests
   source/Card.cpp
   source/ButtonPicture.cpp
   source/Board.cpp
+  source/Functions.cpp
   tests/request_unittests.cpp
   tests/response_unittests.cpp
 )
@@ -48,6 +49,7 @@ add_executable(websocket-chat-server
   source/Card.cpp
   source/ButtonPicture.cpp
   source/Board.cpp
+  source/Functions.cpp
   source/source.cpp
 )
 

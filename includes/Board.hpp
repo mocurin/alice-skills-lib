@@ -1,5 +1,4 @@
 #pragma once
-
 #include <iostream>
 #include <cmath>
 #include <ctime>
@@ -13,9 +12,9 @@
 
 class Board
 {
+    friend std::ostream& operator<<(std::ostream& os, const Board& Player);
+    friend std::istream& operator>>(std::istream& is, Board& Player);
 private:
-// Initialization section.
-
 // Player name.
     std::string name_;
 // My FOV.
@@ -27,14 +26,7 @@ private:
 // Indicates status of all battleships. Ships with 0 health are deleted by Destroy().
     std::map<std::string, size_t> status_;
 // As there are lots of random elements i have to make one rd gen to use all the time;
-    std::mt19937 gen_;
-// Private checks.
-
-// Returns true if position is proper for ship placement. Is used in both random generation and manual placing.
-    bool Check(const tile* pos);
-
-// Random generation and ship building.
-
+    std::pair<size_t, std::mt19937> gen_;
 // Returns "beginning" of ship if poss are generated randomly.
     tile* BuildHeap(const tile* spos, const tile* epos);
 // Returns "beginning" of ship if poss are chosen by player.
@@ -45,16 +37,12 @@ private:
     tile* PickRand();
 // Generate vector of pos + surroundings. Used in random shooting;
     std::vector<tile> GeneratePossible(const tile& pos);
-
-// Utility
-
 // Returns size of ship with beginning in spos and end in epos. Returns 0 if poss are not on the same line.
     size_t Size(const tile* spos, const tile* epos);
 // Returns amount of same sized ships in positions_. Is used in maual placing.
     size_t Amount(const size_t& size);
-
-// Marking
-
+// Disconnects all dynamic memory. The most dangerous thing i have ever done
+    void Disconnect();
 // Marks ALL battleships on clear_ matrix.
     void Mark();
 // Marks named battleship on clear_ matrix.
@@ -62,60 +50,43 @@ private:
 // Destroys named battleship: marks positions around ship on cloudy_ as misses, erases ship from status_ map.
     void Destroy(const std::string& name);
 public:
-    Board(std::string name);
+    Board(const std::string& name, const size_t& seedy);
+    Board(const std::string& name);
     Board();
     ~Board();
-
-// Complex funtions
-
+    Board& operator=(Board& board);
 // GeneratesRandom battlefield;
     void RandomScenario();
 // Returns true if shot hits or pos is invalid, false if shot misses;
     bool Shoot(const tile& pos);
-// Manual placing for ships of any size (<5); Returns false if ship cannot be placed.
-    bool Place(const tile& spos, const tile& epos);
-
-// Show functions
-
-// Shows clear_.
-    void ShowMyBoard();
-// Shows cloudy_.
-    void ShowEnemyBoard();
-// Shows clear_ with chosen position.
-    void ShowTargeted(const tile& pos);
-// Shows status. Is not currently used.
-    void ShowStatus();
+// Manual placing for ships of any size (<5)
+    void Place(const tile& spos, const tile& epos);
 // Returns player name.
     std::string GetName();
 // Returns name of the ship with a named tile. Otherwise returns empty string.
     std::string GetShipName(const tile* pos);
 // Returns random generator. 
-    std::mt19937 GetRdGen();
+    std::mt19937 GetRdGen() { return gen_.second; }
 // Returns amount of ships in positions_.
     size_t ShipsAmount();
 // Returms total amount of ship health
     size_t TotalHealth();
-
-// Public checks
-
+// Returns true if position is proper for ship placement. Is used in both random generation and manual placing.
+    bool Check(const tile* pos);
 // Returns true if position was used before.
     bool WasShot(const tile& pos);
 // Returns true is tile is inside matrix bounds.
     bool IsProper(const tile& pos);
 // Returns true if health of named ship equals to 0.
     bool IsDead(const std::string& name);
-
-// AI
-
 // Random shooting for AI. Can seek and kill damaged ships. If misses damaged ship returns vector of possile positions.
     std::pair<std::vector<tile>, size_t> ShootRand();
 // Randomly chooses position from vector. Can continue seeking after a miss.
     std::pair<std::vector<tile>, size_t> ContinueShooting(std::vector<tile>& positions, size_t& hits);
-
 // Returns std::strings to be used by Alice
     std::string MyBoardToString();
     std::string EnemyBoardToString();
     std::string TargetedToString(const tile& pos);
     std::string StatusToString();
-    std::string ComplexCheck(const tile& spos, const tile& epos);
+    bool AmountCheck(const tile& spos, const tile& epos);
 };

@@ -1,6 +1,6 @@
 #include "Board.hpp"
 
-Board::Board(std::string name)
+Board::Board(const std::string& name, const size_t& seedy)
 {
     name_ = name;
     char** first = new char*[11];
@@ -40,8 +40,12 @@ Board::Board(std::string name)
     }
     clear_ = first;
     cloudy_ = second;
-    std::mt19937 ngen(time(0));
-    gen_ = ngen;
+    gen_.first = seedy;
+    gen_.second.seed(seedy);
+}
+
+Board::Board(const std::string& name) : Board (name, time(0))
+{
 }
 
 Board::Board() : Board("Player")
@@ -56,54 +60,31 @@ Board::~Board()
         delete[] cloudy_[i];
     }
     delete[] clear_;
+    clear_ = nullptr;
     delete[] cloudy_;
+    cloudy_ = nullptr;
     for (auto& i : positions_)
     {
         delete[] i.second;
+        i.second = nullptr;
     }
+}
+
+Board& Board::operator=(Board& board)
+{
+    name_ = board.name_;
+    positions_ = board.positions_;
+    status_ = board.status_;
+    gen_ = board.gen_;
+    clear_ = board.clear_;
+    cloudy_ = board.cloudy_;
+    board.Disconnect();
+    return *this;
 }
 
 std::string Board::GetName()
 {
     return name_;
-}
-
-void Board::ShowMyBoard()
-{
-    for (size_t i = 0; i < 11; ++i)
-    {
-        for (size_t j = 0; j < 11; ++j)
-            std::cout << ' ' << clear_[i][j];
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-}
-
-void Board::ShowTargeted(const tile& pos)
-{
-    for (size_t i = 0; i < 11; ++i)
-    {
-        for (size_t j = 0; j < 11; ++j)
-        {
-            if (pos.first == j && pos.second == i)
-                std::cout << " T";
-            else
-                std::cout << ' ' << clear_[i][j];
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-}
-
-void Board::ShowEnemyBoard()
-{
-    for (size_t i = 0; i < 11; ++i)
-    {
-        for (size_t j = 0; j < 11; ++j)
-            std::cout << ' ' << cloudy_[i][j];
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
 }
 
 std::string Board::MyBoardToString()
@@ -150,33 +131,51 @@ std::string Board::EnemyBoardToString()
     return matrix;
 }
 
-bool Board::Check(const tile* pos)
+std::string Board::GetShipName(const tile* pos)
 {
-    if (!IsProper(*pos))
-        return false;
     for (const auto& i : positions_)
     {
-        for (unsigned it = 0; it < i.first.size(); ++it)
+        for (size_t k = 0; k < i.first.size(); ++k)
         {
-            if (i.second[it].first == pos->first - 1 ||
-                i.second[it].first == pos->first ||
-                i.second[it].first == pos->first + 1)
-                if (i.second[it].second == pos->second - 1 ||
-                    i.second[it].second == pos->second ||
-                    i.second[it].second == pos->second + 1)
-                    return false;
+            if (*pos == i.second[k])
+            {
+                return i.first;
+            }
         }
     }
-    return true;
+    return "";
+}
+
+std::string Board::StatusToString()
+{
+    std::string text;
+    std::string name = "a";
+    char edge = 'e';
+    do
+    {
+        text += name;
+        text += ' ';
+        text += static_cast<bool>(status_[name]);
+        text += '\n';
+        ++name[name.size() - 1];
+        if (name[name.size() - 1] == edge)
+        {
+            name[name.size() - 1] = 'a';
+            name = name + 'a';
+            --edge;
+        }
+    } while (edge != 'a');
+    text += '\n';
+    return text;
 }
 
 tile* Board::PickRand()
 {
     std::uniform_int_distribution<> row(1, 10);
     auto* pos = new tile;
-    *pos = { row(gen_), row(gen_) };
+    *pos = { row(gen_.second), row(gen_.second) };
     while (!Check(pos))
-        *pos = { row(gen_), row(gen_) };
+        *pos = { row(gen_.second), row(gen_.second) };
     return pos;
 }
 
@@ -185,7 +184,7 @@ tile* Board::ThrowRand(const tile* prev, const size_t& jump)
     auto* thrown = new tile;
     auto k = 0u;
     std::uniform_int_distribution<> directions(0, 3);
-    k = directions(gen_);
+    k = directions(gen_.second);
     for (size_t i = 0; i < 4; ++i)
     {
         switch (k)
@@ -215,19 +214,6 @@ tile* Board::ThrowRand(const tile* prev, const size_t& jump)
     delete prev;
     delete thrown;
     return nullptr;
-}
-
-size_t Board::Size(const tile* spos, const tile* epos) 
-{
-    if (spos->first == epos->first)
-    {
-        return std::abs(static_cast<int>(spos->second - epos->second)) + 1;
-    }
-    else if (spos->second == epos->second)
-    {
-        return std::abs(static_cast<int>(spos->first - epos->first)) + 1;
-    }
-    return 0;
 }
 
 tile* Board::BuildHeap(const tile* spos, const tile* epos)
@@ -418,74 +404,66 @@ void Board::Destroy(const std::string& name)
     positions_.erase(name);
 }
 
+void Board::Place(const tile& spos, const tile& epos)
+{
+    auto size = Size(&spos, &epos);
+    auto amount = Amount(size);
+    std::string name;
+    for (size_t i = 0; i < size - 1; ++i)
+    {
+        name += 'a';
+    }
+    name += static_cast<char>('a' + amount);
+    positions_.emplace(name, BuildStack(spos, epos));
+    status_.emplace(name, size);
+    MarkShip(name);
+}
+
+void Board::Disconnect()
+{
+    clear_ = nullptr;
+    cloudy_ = nullptr;
+    for (auto& i : positions_)
+    {
+
+        i.second = nullptr;
+    }
+}
+
 bool operator==(const tile& first, const tile& second)
 {
     return first.first == second.first && first.second == second.second;
 }
 
+bool Board::Check(const tile* pos)
+{
+    if (!IsProper(*pos))
+        return false;
+    for (const auto& i : positions_)
+    {
+        for (unsigned it = 0; it < i.first.size(); ++it)
+        {
+            if (i.second[it].first == pos->first - 1 ||
+                i.second[it].first == pos->first ||
+                i.second[it].first == pos->first + 1)
+                if (i.second[it].second == pos->second - 1 ||
+                    i.second[it].second == pos->second ||
+                    i.second[it].second == pos->second + 1)
+                    return false;
+        }
+    }
+    return true;
+}
+
 bool Board::IsDead(const std::string& name)
 {
+    if (name.empty())
+        return false;
     if (status_[name] == 0)
     {
         return true;
     }
     return false;
-}
-
-std::string Board::GetShipName(const tile* pos)
-{
-    for (const auto& i : positions_)
-    {
-        for (size_t k = 0; k < i.first.size(); ++k)
-        {
-            if (*pos == i.second[k])
-            {
-                return i.first;
-            }
-        }
-    }
-    return "";
-}
-
-void Board::ShowStatus()
-{
-    std::string name = "a";
-    char edge = 'e';
-    do
-    {
-        std::cout << name << ' ' << static_cast<bool>(status_[name]) << std::endl;
-        ++name[name.size() - 1];
-        if (name[name.size() - 1] == edge)
-        {
-            name[name.size() - 1] = 'a';
-            name = name + 'a';
-            --edge;
-        }
-    } while (edge != 'a');
-    std::cout << std::endl;
-}
-
-std::string Board::StatusToString()
-{
-    std::string text;
-    std::string name = "a";
-    char edge = 'e';
-    do
-    {
-        text += name;
-        text += ' ';
-        text += static_cast<bool>(status_[name]);
-        text += '\n';
-        ++name[name.size() - 1];
-        if (name[name.size() - 1] == edge)
-        {
-            name[name.size() - 1] = 'a';
-            name = name + 'a';
-            --edge;
-        }
-    } while (edge != 'a');
-    text += '\n';
-    return text;
 }
 
 bool Board::WasShot(const tile& pos)
@@ -518,6 +496,14 @@ bool Board::Shoot(const tile& pos)
     }
 }
 
+bool Board::AmountCheck(const tile& spos, const tile& epos)
+{
+    auto size = Size(&spos, &epos);
+    size_t edge = 5;
+    auto amount = Amount(size);
+    return amount < (edge - size);
+}
+
 size_t Board::ShipsAmount()
 {
     return positions_.size();
@@ -534,41 +520,27 @@ size_t Board::Amount(const size_t& size)
     return amount;
 }
 
-std::string Board::ComplexCheck(const tile& spos, const tile& epos)
+size_t Board::Size(const tile* spos, const tile* epos)
 {
-    std::string error_text;
-    auto size = Size(&spos, &epos);
-    if (!Check(&spos) || !Check(&epos) || size == 0 || size > 4)
+    if (spos->first == epos->first)
     {
-        error_text += "Неподходящая позиция\n";
-        return error_text;
+        return std::abs(static_cast<int>(spos->second - epos->second)) + 1;
     }
-    auto edge = 5u;
-    auto amount = Amount(size);
-    if (amount >= edge - size)
+    else if (spos->second == epos->second)
     {
-        error_text += "Достаточно ";
-        error_text += size;
-        error_text += "-палубных кораблей\n";
-        return error_text;
+        return std::abs(static_cast<int>(spos->first - epos->first)) + 1;
     }
-    return error_text;
+    return 0;
 }
 
-bool Board::Place(const tile& spos, const tile& epos)
+size_t Board::TotalHealth()
 {
-    auto size = Size(&spos, &epos);
-    auto amount = Amount(size);
-    std::string name;
-    for (size_t i = 0; i < size - 1; ++i)
+    size_t total = 0;
+    for (const auto& i : status_)
     {
-        name += 'a';
+        total += i.second;
     }
-    name += static_cast<char>('a' + amount);
-    positions_.emplace(name, BuildStack(spos, epos));
-    status_.emplace(name, size);
-    MarkShip(name);
-    return true;
+    return total;
 }
 
 std::vector<tile> Board::GeneratePossible(const tile& pos)
@@ -595,7 +567,7 @@ std::pair<std::vector<tile>, size_t> Board::ContinueShooting(std::vector<tile>& 
     if (num != hits)
     {
         std::uniform_int_distribution<> directions(hits, num);
-        num = directions(gen_);
+        num = directions(gen_.second);
     }
     auto name = GetShipName(&positions[num]);
     std::vector<tile> copy;
@@ -667,9 +639,9 @@ std::pair<std::vector<tile>, size_t> Board::ShootRand()
 {
     tile pos;
     std::uniform_int_distribution<> row(1, 10);
-    pos = { row(gen_), row(gen_) };
+    pos = { row(gen_.second), row(gen_.second) };
     while (WasShot(pos))
-        pos = { row(gen_), row(gen_) };
+        pos = { row(gen_.second), row(gen_.second) };
     std::vector <tile> possible;
     if (Shoot(pos))
     {
@@ -685,19 +657,4 @@ std::pair<std::vector<tile>, size_t> Board::ShootRand()
         size_t hits = 0;
         return { possible, hits };
     }
-}
-
-size_t Board::TotalHealth()
-{
-    size_t total = 0;
-    for (const auto& i : status_)
-    {
-        total += i.second;
-    }
-    return total;
-}
-
-std::mt19937 Board::GetRdGen()
-{
-    return gen_;
 }
