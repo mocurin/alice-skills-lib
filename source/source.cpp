@@ -208,7 +208,7 @@ void MyCallback(const Alice::Request& request, Alice::Response& response)
             if (MyVariables.GetPlayer().ShipsAmount() < 10)
             {
                 tmp += ". Осталось";
-				tmp += to_string(10 - MyVariables.GetPlayer().ShipsAmount());
+				tmp += std::to_string(10 - MyVariables.GetPlayer().ShipsAmount());
 				tmp += " кораблей\n";
                 tmp += "\n Первая клетка";
                 MyVariables.SetStage(MANUAL);
