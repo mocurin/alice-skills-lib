@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <fstream>
 
-enum stages { NAME, GREET, PLACEMENT, MANUAL, MANUAL2, INVALID, INVALID2, DECIDE, BEGIN, PLAYER, ALICE, TRYAGAIN };
+enum stages { NAME, GREET, PLACEMENT, MANUAL, MANUAL2, DECIDE, BEGIN, PLAYER, ALICE, TRYAGAIN };
 
 std::pair<stages, size_t> ReadStageAndGen();
 void SaveStageAndGen(const stages& stage, const size_t& seedy);

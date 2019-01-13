@@ -205,9 +205,9 @@ void MyCallback(const Alice::Request& request, Alice::Response& response)
                 break;
             }
             MyVariables.GetPlayer().Place(MyVariables.GetPos(), pos);
-            if (MyVariables.GetPlayer.ShipsAmount() < 10)
+            if (MyVariables.GetPlayer().ShipsAmount() < 10)
             {
-                tmp += ". Осталось" + (10 - MyVariables.GetPlayer.ShipsAmount()) + " кораблей\n";
+                tmp += ". Осталось" + (10 - MyVariables.GetPlayer().ShipsAmount()) + " кораблей\n";
                 tmp += "\n Первая клетка";
                 MyVariables.SetStage(MANUAL);
                 response.SetText(tmp);
@@ -264,6 +264,7 @@ void MyCallback(const Alice::Request& request, Alice::Response& response)
         Alice::Button NotBird("Решка", { "not_bird" }, true);
         response.PushButton(NotBird);
         SaveStageAndGen(BEGIN, info.second);
+		break;
     }
     case BEGIN:
     {
@@ -479,7 +480,7 @@ void MyCallback(const Alice::Request& request, Alice::Response& response)
         {
             Case MyVariables;
             std::string tmp = MyVariables.GetBot().GetShipName(&pos);
-            if (MyVariables.GetBot.Shoot(pos))
+            if (MyVariables.GetBot().Shoot(pos))
             {
                 if (!tmp.empty() && MyVariables.GetBot().IsDead(tmp))
                 {
