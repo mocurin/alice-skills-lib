@@ -15,7 +15,7 @@ void ClearFiles();
 void Trim(std::string& str);
 std::string LoadString();
 std::string Cut(const std::string& str);
-std::string ChooseRandomString(const std::mt19937& gen, const std::vector<std::string>& quotes);
+std::string ChooseRandomString(std::mt19937& gen, const std::vector<std::string>& quotes);
 std::pair<size_t, size_t> DivideBySpace(const std::string& str);
 std::pair<size_t, size_t> GetPos(const std::string& request);
 bool SameLine(const std::pair<size_t, size_t>& pos1, const std::pair<size_t, size_t>& pos2);
