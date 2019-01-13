@@ -1,8 +1,24 @@
 #include "Header.hpp"
 
+bool HandleEmpty(const Alice::Request& request, Alice::Response& response)
+{
+    const auto& session = request.Session();
+    if (!session.IsNew())
+        if (request.Command() == "")
+        {
+            ClearFiles();
+            response.SetText("bruh");
+            response.SetEndSession(true);
+            return true;
+        }
+    return false;
+}
+
 void MyCallback(const Alice::Request& request, Alice::Response& response)
 {
     auto info = ReadStageAndGen();
+    if (HandleEmpty(request, response))
+        return;
     switch (info.first)
     {
     case NAME:
@@ -208,9 +224,8 @@ void MyCallback(const Alice::Request& request, Alice::Response& response)
             if (MyVariables.GetPlayer().ShipsAmount() < 10)
             {
                 tmp += ". Осталось";
-				tmp += std::to_string(10 - MyVariables.GetPlayer().ShipsAmount());
-				tmp += " кораблей\n";
-                tmp += "\n Первая клетка";
+                tmp += std::to_string(10 - MyVariables.GetPlayer().ShipsAmount());
+                tmp += " кораблей\n";
                 MyVariables.SetStage(MANUAL);
                 response.SetText(tmp);
                 response.SetTts(tmp);
@@ -266,7 +281,7 @@ void MyCallback(const Alice::Request& request, Alice::Response& response)
         Alice::Button NotBird("Решка", { "not_bird" }, true);
         response.PushButton(NotBird);
         SaveStageAndGen(BEGIN, info.second);
-		break;
+        break;
     }
     case BEGIN:
     {

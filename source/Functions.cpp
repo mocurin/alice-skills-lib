@@ -121,8 +121,10 @@ std::string ChooseRandomString(std::mt19937& gen, const std::vector<std::string>
 std::pair<stages, size_t> ReadStageAndGen()
 {
     std::ifstream in("STAGE.txt");
+    if (!in.is_open())
+        return { NAME, static_cast<size_t>(time(0)) };
     if (in.peek() == std::ifstream::traits_type::eof())
-        return{ NAME, static_cast<size_t>(time(0)) };
+        return { NAME, static_cast<size_t>(time(0)) };
     std::string tmp1;
     getline(in, tmp1);
     std::string tmp2;
