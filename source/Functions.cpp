@@ -111,7 +111,7 @@ std::string LoadString()
     return result;
 }
 
-std::string ChooseRandomString(const std::mt19937& gen, const std::vector<std::string>& quotes)
+std::string ChooseRandomString(std::mt19937& gen, const std::vector<std::string>& quotes)
 {
     std::uniform_int_distribution<> directions(0, quotes.size() - 1);
     auto num = directions(gen);
