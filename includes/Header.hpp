@@ -83,14 +83,14 @@ public:
 
     void SaveStageAndGen()
     {
-        std::ofstream out("STAGE.txt");
+        std::ofstream out("./STAGE.txt");
         out << stage_ << std::endl;
         out << gen_.first << std::endl;
     }
 
     void SaveToFile()
     {
-        std::ofstream out("DATA.txt");
+        std::ofstream out("./DATA.txt");
         out << player_;
         out << bot_;
         out << pos_.first << ' ' << pos_.second << std::endl;
@@ -104,14 +104,14 @@ public:
 
     void ReadFromFile()
     {
-        std::ifstream in("DATA.txt");
+        std::ifstream in("./DATA.txt");
         in >> player_;
         in >> bot_;
         std::string str;
         getline(in, str);
         pos_ = DivideBySpace(str);
         getline(in, str);
-        size_t size = std::stoi(str);
+        size_t size = std::stoul(str);
         if (size == 0)
         {
             tracking_.first = {};
@@ -122,6 +122,6 @@ public:
             tracking_.first.push_back(DivideBySpace(str));
         }
         getline(in, str);
-        tracking_.second = std::stoi(str);
+        tracking_.second = std::stoul(str);
     }
 };

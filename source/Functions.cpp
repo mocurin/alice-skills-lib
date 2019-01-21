@@ -64,11 +64,11 @@ std::istream& operator>>(std::istream& is, Board& Player)
     {
         getline(is, tmp);
         getline(is, str);
-        Player.status_.emplace(tmp, std::stoi(str));
+        Player.status_.emplace(tmp, std::stoul(str));
     }
     getline(is, str);
-    Player.gen_.first = std::stoi(str);
-    Player.gen_.second.seed(std::stoi(str));
+    Player.gen_.first = std::stoul(str);
+    Player.gen_.second.seed(std::stoul(str));
     return is;
 }
 
@@ -79,14 +79,13 @@ void Trim(std::string& str)
 
 void SaveString(const std::string& str)
 {
-    std::ofstream out("TMP.txt");
-    out << str;
-    out << '$';
+    std::ofstream out("./TMP.txt");
+    out << str << '$';
 }
 
 void SaveStageAndGen(const stages& stage, const size_t& seedy)
 {
-    std::ofstream out("STAGE.txt");
+    std::ofstream out("./STAGE.txt");
     out << stage << std::endl;
     out << seedy << std::endl;
 }
@@ -120,15 +119,21 @@ std::string ChooseRandomString(std::mt19937& gen, const std::vector<std::string>
 
 std::pair<stages, size_t> ReadStageAndGen()
 {
-    std::ifstream in("STAGE.txt");
+    std::ifstream in("./STAGE.txt");
     if (!in.is_open())
-        return { NAME, static_cast<size_t>(time(0)) };
+    {
+        std::random_device rd;
+        return { NAME, static_cast<size_t>(rd()) };
+    }
     if (in.peek() == std::ifstream::traits_type::eof())
-        return { NAME, static_cast<size_t>(time(0)) };
+    {
+        std::random_device rd;
+        return { NAME, static_cast<size_t>(rd()) };
+    }
     std::string tmp1;
     getline(in, tmp1);
     std::string tmp2;
-    return { static_cast<stages>(std::stoi(tmp1)), static_cast<size_t>(std::stoi(tmp2)) };
+    return { static_cast<stages>(std::stoi(tmp1)), std::stoul(tmp2) };
 }
 
 std::pair<size_t, size_t> GetPos(const std::string& request)

@@ -16,6 +16,7 @@ bool HandleEmpty(const Alice::Request& request, Alice::Response& response)
 
 void MyCallback(const Alice::Request& request, Alice::Response& response)
 {
+    response.SetEndSession(false);
     auto info = ReadStageAndGen();
     if (HandleEmpty(request, response))
         return;
