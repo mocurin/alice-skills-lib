@@ -18,12 +18,12 @@ void StName(const Alice::Request& request, Alice::Response& response,
     const std::pair<stages, size_t>& info) {
     std::mt19937 gen(info.second);
     std::string tmp = ChooseRandomString(gen,
-        { "Как вас зовут?",
-        "Имя?",
-        "Кэп, ваше имя?",
-        "Как вас называть?",
-        "Как к вам обращаться?",
-        "Ваше имя?"
+        { "РљР°Рє РІР°СЃ Р·РѕРІСѓС‚?",
+        "РРјСЏ?",
+        "РљСЌРї, РІР°С€Рµ РёРјСЏ?",
+        "РљР°Рє РІР°СЃ РЅР°Р·С‹РІР°С‚СЊ?",
+        "РљР°Рє Рє РІР°Рј РѕР±СЂР°С‰Р°С‚СЊСЃСЏ?",
+        "Р’Р°С€Рµ РёРјСЏ?"
         });
     response.SetText(tmp);
     response.SetTts(tmp);
@@ -35,19 +35,19 @@ void StGreet(const Alice::Request& request, Alice::Response& response,
     std::mt19937 gen(info.second);
     std::string tmp = Cut(request.Command());
     Case MyVariables(info, tmp);
-    tmp = "Приятно с вами познакомиться, " + tmp + "\n\n";
+    tmp = "РџСЂРёСЏС‚РЅРѕ СЃ РІР°РјРё РїРѕР·РЅР°РєРѕРјРёС‚СЊСЃСЏ, " + tmp + "\n\n";
     tmp += ChooseRandomString(gen,
-        { "Как будем расставлять корабли? Вручную или случайно?",
-        "Выберите как расставлять корабли: вручную или случайно",
-        "Я могу помочь расставить ваши корабли вручную или сделать это случайно. Что выберете?",
-        "Вы можете расставить корабли вручную или позволить мне сделать это случайным образом. Что выберете?",
-        "Корабли можно расставить вручную или случайно. Какой вариант вам больше подходит?"
+        { "РљР°Рє Р±СѓРґРµРј СЂР°СЃСЃС‚Р°РІР»СЏС‚СЊ РєРѕСЂР°Р±Р»Рё? Р’СЂСѓС‡РЅСѓСЋ РёР»Рё СЃР»СѓС‡Р°Р№РЅРѕ?",
+        "Р’С‹Р±РµСЂРёС‚Рµ РєР°Рє СЂР°СЃСЃС‚Р°РІР»СЏС‚СЊ РєРѕСЂР°Р±Р»Рё: РІСЂСѓС‡РЅСѓСЋ РёР»Рё СЃР»СѓС‡Р°Р№РЅРѕ",
+        "РЇ РјРѕРіСѓ РїРѕРјРѕС‡СЊ СЂР°СЃСЃС‚Р°РІРёС‚СЊ РІР°С€Рё РєРѕСЂР°Р±Р»Рё РІСЂСѓС‡РЅСѓСЋ РёР»Рё СЃРґРµР»Р°С‚СЊ СЌС‚Рѕ СЃР»СѓС‡Р°Р№РЅРѕ. Р§С‚Рѕ РІС‹Р±РµСЂРµС‚Рµ?",
+        "Р’С‹ РјРѕР¶РµС‚Рµ СЂР°СЃСЃС‚Р°РІРёС‚СЊ РєРѕСЂР°Р±Р»Рё РІСЂСѓС‡РЅСѓСЋ РёР»Рё РїРѕР·РІРѕР»РёС‚СЊ РјРЅРµ СЃРґРµР»Р°С‚СЊ СЌС‚Рѕ СЃР»СѓС‡Р°Р№РЅС‹Рј РѕР±СЂР°Р·РѕРј. Р§С‚Рѕ РІС‹Р±РµСЂРµС‚Рµ?",
+        "РљРѕСЂР°Р±Р»Рё РјРѕР¶РЅРѕ СЂР°СЃСЃС‚Р°РІРёС‚СЊ РІСЂСѓС‡РЅСѓСЋ РёР»Рё СЃР»СѓС‡Р°Р№РЅРѕ. РљР°РєРѕР№ РІР°СЂРёР°РЅС‚ РІР°Рј Р±РѕР»СЊС€Рµ РїРѕРґС…РѕРґРёС‚?"
         });
     response.SetText(tmp);
     response.SetTts(tmp);
-    Alice::Button ButtonH("Вручную", { "hard_method" }, true);
+    Alice::Button ButtonH("Р’СЂСѓС‡РЅСѓСЋ", { "hard_method" }, true);
     response.PushButton(ButtonH);
-    Alice::Button ButtonE("Случайно", { "easy_method" }, true);
+    Alice::Button ButtonE("РЎР»СѓС‡Р°Р№РЅРѕ", { "easy_method" }, true);
     response.PushButton(ButtonE);
     MyVariables.SetStage(PLACEMENT);
 }
@@ -58,21 +58,21 @@ void StPlacement(const Alice::Request& request, Alice::Response& response,
     std::string tmp;
     if (request.Payload().dump() == "easy_method") {
         tmp = ChooseRandomString(MyVariables.GetGen(),
-            { "Итак, вы выбрали легкий путь. Спасибо\n",
-            "Это экономит время и нервы, спасибо\n",
-            "Правильное решение. Спасибо\n",
-            "Так все становится проще. Спасибо\n",
-            "На секунду я подумала что их придется ставить вручную. Спасибо\n"
+            { "РС‚Р°Рє, РІС‹ РІС‹Р±СЂР°Р»Рё Р»РµРіРєРёР№ РїСѓС‚СЊ. РЎРїР°СЃРёР±Рѕ\n",
+            "Р­С‚Рѕ СЌРєРѕРЅРѕРјРёС‚ РІСЂРµРјСЏ Рё РЅРµСЂРІС‹, СЃРїР°СЃРёР±Рѕ\n",
+            "РџСЂР°РІРёР»СЊРЅРѕРµ СЂРµС€РµРЅРёРµ. РЎРїР°СЃРёР±Рѕ\n",
+            "РўР°Рє РІСЃРµ СЃС‚Р°РЅРѕРІРёС‚СЃСЏ РїСЂРѕС‰Рµ. РЎРїР°СЃРёР±Рѕ\n",
+            "РќР° СЃРµРєСѓРЅРґСѓ СЏ РїРѕРґСѓРјР°Р»Р° С‡С‚Рѕ РёС… РїСЂРёРґРµС‚СЃСЏ СЃС‚Р°РІРёС‚СЊ РІСЂСѓС‡РЅСѓСЋ. РЎРїР°СЃРёР±Рѕ\n"
             });
-        tmp += "\nВот ваше поле:\n\n";
+        tmp += "\nР’РѕС‚ РІР°С€Рµ РїРѕР»Рµ:\n\n";
         response.SetTts(tmp);
         MyVariables.GetUser().RandomScenario();
         tmp += MyVariables.GetUser().InnerToString();
         response.SetText(tmp);
         tmp = ChooseRandomString(MyVariables.GetGen(),
-            { "Не за что",
-            "Всегда к вашим услугам",
-            "Никто не стал бы ставить их вручную"
+            { "РќРµ Р·Р° С‡С‚Рѕ",
+            "Р’СЃРµРіРґР° Рє РІР°С€РёРј СѓСЃР»СѓРіР°Рј",
+            "РќРёРєС‚Рѕ РЅРµ СЃС‚Р°Р» Р±С‹ СЃС‚Р°РІРёС‚СЊ РёС… РІСЂСѓС‡РЅСѓСЋ"
             });
         Alice::Button Button(tmp, { "useless_button" }, true);
         response.PushButton(Button);
@@ -91,21 +91,21 @@ void StManual(const Alice::Request& request, Alice::Response& response,
         {
             MyVariables.SetPos(pos);
             std::string tmp = MyVariables.GetUser().TargetedToString(pos);
-            tmp += "\nВторая клетка";
+            tmp += "\nР’С‚РѕСЂР°СЏ РєР»РµС‚РєР°";
             response.SetText(tmp);
-            response.SetTts("Вторая клетка");
+            response.SetTts("Р’С‚РѕСЂР°СЏ РєР»РµС‚РєР°");
             MyVariables.SetStage(MANUAL2);
             return;
         }
         tmp = ChooseRandomString(MyVariables.GetGen(),
-            { "Так не получится, рядом уже есть корабль. ",
-            "Корабли не могут располагаться вплотную или пересекаться. ",
-            "Слишком близко к другому кораблю. "
+            { "РўР°Рє РЅРµ РїРѕР»СѓС‡РёС‚СЃСЏ, СЂСЏРґРѕРј СѓР¶Рµ РµСЃС‚СЊ РєРѕСЂР°Р±Р»СЊ. ",
+            "РљРѕСЂР°Р±Р»Рё РЅРµ РјРѕРіСѓС‚ СЂР°СЃРїРѕР»Р°РіР°С‚СЊСЃСЏ РІРїР»РѕС‚РЅСѓСЋ РёР»Рё РїРµСЂРµСЃРµРєР°С‚СЊСЃСЏ. ",
+            "РЎР»РёС€РєРѕРј Р±Р»РёР·РєРѕ Рє РґСЂСѓРіРѕРјСѓ РєРѕСЂР°Р±Р»СЋ. "
             });
         tmp += ChooseRandomString(MyVariables.GetGen(),
-            { "Попробуй еще раз",
-            "Еще раз ",
-            "Стоит попробовать еще раз "
+            { "РџРѕРїСЂРѕР±СѓР№ РµС‰Рµ СЂР°Р·",
+            "Р•С‰Рµ СЂР°Р· ",
+            "РЎС‚РѕРёС‚ РїРѕРїСЂРѕР±РѕРІР°С‚СЊ РµС‰Рµ СЂР°Р· "
             });
         response.SetText(tmp);
         response.SetTts(tmp);
@@ -113,13 +113,13 @@ void StManual(const Alice::Request& request, Alice::Response& response,
     }
     std::mt19937 gen(info.second);
     std::string tmp = ChooseRandomString(gen,
-        { "Еще раз?\n",
-        "Сложно. Еще раз?\n",
-        "Что-что?\n",
-        "Мне просто нужны буквы\n",
-        "Еще разок можно?\n",
-        "А? Я прослушала, простите\n",
-        "Если у нас такие проблемы с первой, то что будет со второй? Попробуй еще раз\n"
+        { "Р•С‰Рµ СЂР°Р·?\n",
+        "РЎР»РѕР¶РЅРѕ. Р•С‰Рµ СЂР°Р·?\n",
+        "Р§С‚Рѕ-С‡С‚Рѕ?\n",
+        "РњРЅРµ РїСЂРѕСЃС‚Рѕ РЅСѓР¶РЅС‹ Р±СѓРєРІС‹\n",
+        "Р•С‰Рµ СЂР°Р·РѕРє РјРѕР¶РЅРѕ?\n",
+        "Рђ? РЇ РїСЂРѕСЃР»СѓС€Р°Р»Р°, РїСЂРѕСЃС‚РёС‚Рµ\n",
+        "Р•СЃР»Рё Сѓ РЅР°СЃ С‚Р°РєРёРµ РїСЂРѕР±Р»РµРјС‹ СЃ РїРµСЂРІРѕР№, С‚Рѕ С‡С‚Рѕ Р±СѓРґРµС‚ СЃРѕ РІС‚РѕСЂРѕР№? РџРѕРїСЂРѕР±СѓР№ РµС‰Рµ СЂР°Р·\n"
         });
     response.SetText(tmp);
     response.SetTts(tmp);
@@ -135,15 +135,15 @@ void StManual2(const Alice::Request& request, Alice::Response& response,
         if (!IsProperPlaced(MyVariables.GetPos(), pos))
         {
             tmp = ChooseRandomString(MyVariables.GetGen(),
-                { "Клетки должны быть на одной прямой. ",
-                "Клетки располагаются не на одной прямой. ",
-                "Указанные позиции не располагаются на одной прямой. ",
-                "Указанные позиции располагаются не на одной прямой. "
+                { "РљР»РµС‚РєРё РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РЅР° РѕРґРЅРѕР№ РїСЂСЏРјРѕР№. ",
+                "РљР»РµС‚РєРё СЂР°СЃРїРѕР»Р°РіР°СЋС‚СЃСЏ РЅРµ РЅР° РѕРґРЅРѕР№ РїСЂСЏРјРѕР№. ",
+                "РЈРєР°Р·Р°РЅРЅС‹Рµ РїРѕР·РёС†РёРё РЅРµ СЂР°СЃРїРѕР»Р°РіР°СЋС‚СЃСЏ РЅР° РѕРґРЅРѕР№ РїСЂСЏРјРѕР№. ",
+                "РЈРєР°Р·Р°РЅРЅС‹Рµ РїРѕР·РёС†РёРё СЂР°СЃРїРѕР»Р°РіР°СЋС‚СЃСЏ РЅРµ РЅР° РѕРґРЅРѕР№ РїСЂСЏРјРѕР№. "
                 });
             tmp += ChooseRandomString(MyVariables.GetGen(),
-                { "Попробуй еще раз",
-                "Еще раз ",
-                "Стоит попробовать еще раз "
+                { "РџРѕРїСЂРѕР±СѓР№ РµС‰Рµ СЂР°Р·",
+                "Р•С‰Рµ СЂР°Р· ",
+                "РЎС‚РѕРёС‚ РїРѕРїСЂРѕР±РѕРІР°С‚СЊ РµС‰Рµ СЂР°Р· "
                 });
             response.SetText(tmp);
             response.SetTts(tmp);
@@ -152,14 +152,14 @@ void StManual2(const Alice::Request& request, Alice::Response& response,
         if (!MyVariables.GetUser().IsProperForPlacement(pos))
         {
             tmp = ChooseRandomString(MyVariables.GetGen(),
-                { "Так не получится, рядом уже есть корабль. ",
-                "Корабли не могут располагаться вплотную или пересекаться. ",
-                "Слишком близко к другому кораблю. "
+                { "РўР°Рє РЅРµ РїРѕР»СѓС‡РёС‚СЃСЏ, СЂСЏРґРѕРј СѓР¶Рµ РµСЃС‚СЊ РєРѕСЂР°Р±Р»СЊ. ",
+                "РљРѕСЂР°Р±Р»Рё РЅРµ РјРѕРіСѓС‚ СЂР°СЃРїРѕР»Р°РіР°С‚СЊСЃСЏ РІРїР»РѕС‚РЅСѓСЋ РёР»Рё РїРµСЂРµСЃРµРєР°С‚СЊСЃСЏ. ",
+                "РЎР»РёС€РєРѕРј Р±Р»РёР·РєРѕ Рє РґСЂСѓРіРѕРјСѓ РєРѕСЂР°Р±Р»СЋ. "
                 });
             tmp += ChooseRandomString(MyVariables.GetGen(),
-                { "Попробуй еще раз",
-                "Еще раз ",
-                "Стоит попробовать еще раз "
+                { "РџРѕРїСЂРѕР±СѓР№ РµС‰Рµ СЂР°Р·",
+                "Р•С‰Рµ СЂР°Р· ",
+                "РЎС‚РѕРёС‚ РїРѕРїСЂРѕР±РѕРІР°С‚СЊ РµС‰Рµ СЂР°Р· "
                 });
             response.SetText(tmp);
             response.SetTts(tmp);
@@ -168,15 +168,15 @@ void StManual2(const Alice::Request& request, Alice::Response& response,
         if (!IsProperSized(MyVariables.GetPos(), pos))
         {
             tmp = ChooseRandomString(MyVariables.GetGen(),
-                { "Корабль неподходящего размера. ",
-                "Корабль слишком большой. ",
-                "Таких кораблей не бывает. ",
-                "Не бывает таких кораблей. "
+                { "РљРѕСЂР°Р±Р»СЊ РЅРµРїРѕРґС…РѕРґСЏС‰РµРіРѕ СЂР°Р·РјРµСЂР°. ",
+                "РљРѕСЂР°Р±Р»СЊ СЃР»РёС€РєРѕРј Р±РѕР»СЊС€РѕР№. ",
+                "РўР°РєРёС… РєРѕСЂР°Р±Р»РµР№ РЅРµ Р±С‹РІР°РµС‚. ",
+                "РќРµ Р±С‹РІР°РµС‚ С‚Р°РєРёС… РєРѕСЂР°Р±Р»РµР№. "
                 });
             tmp += ChooseRandomString(MyVariables.GetGen(),
-                { "Попробуй еще раз",
-                "Еще раз ",
-                "Стоит попробовать еще раз "
+                { "РџРѕРїСЂРѕР±СѓР№ РµС‰Рµ СЂР°Р·",
+                "Р•С‰Рµ СЂР°Р· ",
+                "РЎС‚РѕРёС‚ РїРѕРїСЂРѕР±РѕРІР°С‚СЊ РµС‰Рµ СЂР°Р· "
                 });
             response.SetText(tmp);
             response.SetTts(tmp);
@@ -185,15 +185,15 @@ void StManual2(const Alice::Request& request, Alice::Response& response,
         if (MyVariables.GetUser().IsNeeded(MyVariables.GetPos(), pos))
         {
             tmp = ChooseRandomString(MyVariables.GetGen(),
-                { "Таких кораблей достаточно. ",
-                "Больше таких кораблей не нужно. ",
-                "Такие корабли кончились. ",
-                "Может хватит таких кораблей?. "
+                { "РўР°РєРёС… РєРѕСЂР°Р±Р»РµР№ РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ. ",
+                "Р‘РѕР»СЊС€Рµ С‚Р°РєРёС… РєРѕСЂР°Р±Р»РµР№ РЅРµ РЅСѓР¶РЅРѕ. ",
+                "РўР°РєРёРµ РєРѕСЂР°Р±Р»Рё РєРѕРЅС‡РёР»РёСЃСЊ. ",
+                "РњРѕР¶РµС‚ С…РІР°С‚РёС‚ С‚Р°РєРёС… РєРѕСЂР°Р±Р»РµР№?. "
                 });
             tmp += ChooseRandomString(MyVariables.GetGen(),
-                { "Попробуй еще раз",
-                "Еще раз ",
-                "Стоит попробовать еще раз "
+                { "РџРѕРїСЂРѕР±СѓР№ РµС‰Рµ СЂР°Р·",
+                "Р•С‰Рµ СЂР°Р· ",
+                "РЎС‚РѕРёС‚ РїРѕРїСЂРѕР±РѕРІР°С‚СЊ РµС‰Рµ СЂР°Р· "
                 });
             response.SetText(tmp);
             response.SetTts(tmp);
@@ -202,42 +202,42 @@ void StManual2(const Alice::Request& request, Alice::Response& response,
         MyVariables.GetUser().Place(MyVariables.GetPos(), pos);
         if (MyVariables.GetUser().TotalShips() < 10)
         {
-            tmp += ". Осталось";
+            tmp += ". РћСЃС‚Р°Р»РѕСЃСЊ";
             tmp += std::to_string(10 - MyVariables.GetUser().TotalShips());
-            tmp += " кораблей\n";
+            tmp += " РєРѕСЂР°Р±Р»РµР№\n";
             MyVariables.SetStage(MANUAL);
             response.SetText(tmp);
             response.SetTts(tmp);
             return;
         }
         tmp = ChooseRandomString(MyVariables.GetGen(),
-            { "Кораблей хватит. ",
-            "Все, корабли расставлены.",
-            "Все корабли расставлены ",
-            "Корабли кончились. "
+            { "РљРѕСЂР°Р±Р»РµР№ С…РІР°С‚РёС‚. ",
+            "Р’СЃРµ, РєРѕСЂР°Р±Р»Рё СЂР°СЃСЃС‚Р°РІР»РµРЅС‹.",
+            "Р’СЃРµ РєРѕСЂР°Р±Р»Рё СЂР°СЃСЃС‚Р°РІР»РµРЅС‹ ",
+            "РљРѕСЂР°Р±Р»Рё РєРѕРЅС‡РёР»РёСЃСЊ. "
             });
         tmp += ChooseRandomString(MyVariables.GetGen(),
-            { "Наконец-то это кончилось",
-            "Лучше бы расставили случайно ",
-            "Отличная работа",
-            "Хорошая работа"
+            { "РќР°РєРѕРЅРµС†-С‚Рѕ СЌС‚Рѕ РєРѕРЅС‡РёР»РѕСЃСЊ",
+            "Р›СѓС‡С€Рµ Р±С‹ СЂР°СЃСЃС‚Р°РІРёР»Рё СЃР»СѓС‡Р°Р№РЅРѕ ",
+            "РћС‚Р»РёС‡РЅР°СЏ СЂР°Р±РѕС‚Р°",
+            "РҐРѕСЂРѕС€Р°СЏ СЂР°Р±РѕС‚Р°"
             });
         response.SetText(tmp);
         response.SetTts(tmp);
-        Alice::Button Button("Спасибо", { "useless_button" }, true);
+        Alice::Button Button("РЎРїР°СЃРёР±Рѕ", { "useless_button" }, true);
         response.PushButton(Button);
         MyVariables.SetStage(DECIDE);
         return;
     }
     std::mt19937 gen(info.second);
     std::string tmp = ChooseRandomString(gen,
-        { "Еще раз?\n",
-        "Сложно. Еще раз?\n",
-        "Что-что?\n",
-        "Мне просто нужны цифры\n",
-        "Еще разок можно?\n",
-        "А? Я прослушала, простите\n",
-        "В первый раз лучше получилось\n"
+        { "Р•С‰Рµ СЂР°Р·?\n",
+        "РЎР»РѕР¶РЅРѕ. Р•С‰Рµ СЂР°Р·?\n",
+        "Р§С‚Рѕ-С‡С‚Рѕ?\n",
+        "РњРЅРµ РїСЂРѕСЃС‚Рѕ РЅСѓР¶РЅС‹ С†РёС„СЂС‹\n",
+        "Р•С‰Рµ СЂР°Р·РѕРє РјРѕР¶РЅРѕ?\n",
+        "Рђ? РЇ РїСЂРѕСЃР»СѓС€Р°Р»Р°, РїСЂРѕСЃС‚РёС‚Рµ\n",
+        "Р’ РїРµСЂРІС‹Р№ СЂР°Р· Р»СѓС‡С€Рµ РїРѕР»СѓС‡РёР»РѕСЃСЊ\n"
         });
     response.SetText(tmp);
     response.SetTts(tmp);
@@ -247,17 +247,17 @@ void StDecide(const Alice::Request& request, Alice::Response& response,
     const std::pair<stages, size_t>& info) {
     std::mt19937 gen(info.second);
     std::string tmp = ChooseRandomString(gen,
-        { "Я постараюсь не жульничать\n",
-        "Обещаю что не буду жульничать\n",
-        "Не беспокойся, я ничего не запомнила\n",
-        "Сейчас я забуду где стоят все твои корабли и мы начнем\n"
+        { "РЇ РїРѕСЃС‚Р°СЂР°СЋСЃСЊ РЅРµ Р¶СѓР»СЊРЅРёС‡Р°С‚СЊ\n",
+        "РћР±РµС‰Р°СЋ С‡С‚Рѕ РЅРµ Р±СѓРґСѓ Р¶СѓР»СЊРЅРёС‡Р°С‚СЊ\n",
+        "РќРµ Р±РµСЃРїРѕРєРѕР№СЃСЏ, СЏ РЅРёС‡РµРіРѕ РЅРµ Р·Р°РїРѕРјРЅРёР»Р°\n",
+        "РЎРµР№С‡Р°СЃ СЏ Р·Р°Р±СѓРґСѓ РіРґРµ СЃС‚РѕСЏС‚ РІСЃРµ С‚РІРѕРё РєРѕСЂР°Р±Р»Рё Рё РјС‹ РЅР°С‡РЅРµРј\n"
         });
-    tmp += "\nДавай решим кто будет ходить первым. Орел или решка?";
+    tmp += "\nР”Р°РІР°Р№ СЂРµС€РёРј РєС‚Рѕ Р±СѓРґРµС‚ С…РѕРґРёС‚СЊ РїРµСЂРІС‹Рј. РћСЂРµР» РёР»Рё СЂРµС€РєР°?";
     response.SetText(tmp);
     response.SetTts(tmp);
-    Alice::Button Bird("Орел", { "bird" }, true);
+    Alice::Button Bird("РћСЂРµР»", { "bird" }, true);
     response.PushButton(Bird);
-    Alice::Button NotBird("Решка", { "not_bird" }, true);
+    Alice::Button NotBird("Р РµС€РєР°", { "not_bird" }, true);
     response.PushButton(NotBird);
     SaveStageAndGen(BEGIN, info.second);
 }
@@ -266,33 +266,33 @@ void StBegin(const Alice::Request& request, Alice::Response& response,
     const std::pair<stages, size_t>& info) {
     Case MyVariables;
     std::string tmp = request.Payload().dump();
-    std::string tts = "Тогда я выбираю ";
+    std::string tts = "РўРѕРіРґР° СЏ РІС‹Р±РёСЂР°СЋ ";
     if (tmp == "bird" || tmp == "not_bird")
     {
         if (tmp == "bird")
         {
-            tts += "решку\n";
+            tts += "СЂРµС€РєСѓ\n";
         }
         else
         {
-            tts += "орла\n";
+            tts += "РѕСЂР»Р°\n";
         }
         if (tmp == ChooseRandomString(MyVariables.GetGen(), { "bird", "not_bird" }))
         {
             tmp = tts;
             tmp += ChooseRandomString(MyVariables.GetGen(),
-                { "\nСегодня выиграл ты\n\n",
-                "\nТак не честно\n\n",
-                "\nВ следующий раз выиграю я\n\n",
-                "\nВечно так\n\n"
+                { "\nРЎРµРіРѕРґРЅСЏ РІС‹РёРіСЂР°Р» С‚С‹\n\n",
+                "\nРўР°Рє РЅРµ С‡РµСЃС‚РЅРѕ\n\n",
+                "\nР’ СЃР»РµРґСѓСЋС‰РёР№ СЂР°Р· РІС‹РёРіСЂР°СЋ СЏ\n\n",
+                "\nР’РµС‡РЅРѕ С‚Р°Рє\n\n"
                 });
             std::string choise = ChooseRandomString(MyVariables.GetGen(),
-                { "\nКуда стрелять?",
-                "\nКуда бить?",
-                "\nКуда ударить?",
-                "\nПо какой позиции ударить?",
-                "\nПо какой позиции бить?",
-                "\nПо какой позиции стрелять?"
+                { "\nРљСѓРґР° СЃС‚СЂРµР»СЏС‚СЊ?",
+                "\nРљСѓРґР° Р±РёС‚СЊ?",
+                "\nРљСѓРґР° СѓРґР°СЂРёС‚СЊ?",
+                "\nРџРѕ РєР°РєРѕР№ РїРѕР·РёС†РёРё СѓРґР°СЂРёС‚СЊ?",
+                "\nРџРѕ РєР°РєРѕР№ РїРѕР·РёС†РёРё Р±РёС‚СЊ?",
+                "\nРџРѕ РєР°РєРѕР№ РїРѕР·РёС†РёРё СЃС‚СЂРµР»СЏС‚СЊ?"
                 });
             response.SetTts(tmp + choise);
             response.SetText(tmp + MyVariables.GetBot().OuterToString() + choise);
@@ -301,27 +301,27 @@ void StBegin(const Alice::Request& request, Alice::Response& response,
         }
         tmp = tts;
         tmp += ChooseRandomString(MyVariables.GetGen(),
-            { "Я победила!",
-            "Удача на моей стороне",
-            "В следующий раз повезет",
-            "Я хожу"
+            { "РЇ РїРѕР±РµРґРёР»Р°!",
+            "РЈРґР°С‡Р° РЅР° РјРѕРµР№ СЃС‚РѕСЂРѕРЅРµ",
+            "Р’ СЃР»РµРґСѓСЋС‰РёР№ СЂР°Р· РїРѕРІРµР·РµС‚",
+            "РЇ С…РѕР¶Сѓ"
             });
         response.SetTts(tmp);
         response.SetText(tmp);
-        Alice::Button Boop("Эх!", { "useless_button" }, true);
+        Alice::Button Boop("Р­С…!", { "useless_button" }, true);
         response.PushButton(Boop);
         MyVariables.SetStage(ALICE);
         return;
     }
     tmp = ChooseRandomString(MyVariables.GetGen(),
-        { "Что-что? Мне ходить? Ладно!",
-        "Я похожу, а ты соберись с мыслями",
-        "Ничего не поняла, а потому буду ходить",
-        "Тогда я хожу, ты не против?"
+        { "Р§С‚Рѕ-С‡С‚Рѕ? РњРЅРµ С…РѕРґРёС‚СЊ? Р›Р°РґРЅРѕ!",
+        "РЇ РїРѕС…РѕР¶Сѓ, Р° С‚С‹ СЃРѕР±РµСЂРёСЃСЊ СЃ РјС‹СЃР»СЏРјРё",
+        "РќРёС‡РµРіРѕ РЅРµ РїРѕРЅСЏР»Р°, Р° РїРѕС‚РѕРјСѓ Р±СѓРґСѓ С…РѕРґРёС‚СЊ",
+        "РўРѕРіРґР° СЏ С…РѕР¶Сѓ, С‚С‹ РЅРµ РїСЂРѕС‚РёРІ?"
         });
     response.SetTts(tmp);
     response.SetText(tmp);
-    Alice::Button Boop("Эх!", { "useless_button" }, true);
+    Alice::Button Boop("Р­С…!", { "useless_button" }, true);
     response.PushButton(Boop);
     MyVariables.SetStage(ALICE);
 }
@@ -335,11 +335,11 @@ void StAlice(const Alice::Request& request, Alice::Response& response,
     if (request.RequestType() != Alice::Request::Type::ButtonPressed)
     {
         tmp = ChooseRandomString(MyVariables.GetGen(),
-            { "Моя очередь!\n",
-            "Теперь я стреляю!\n",
-            "Куда бы ударить?\n",
-            "Наконец моя очередь\n",
-            "Попаду или промажу?\n"
+            { "РњРѕСЏ РѕС‡РµСЂРµРґСЊ!\n",
+            "РўРµРїРµСЂСЊ СЏ СЃС‚СЂРµР»СЏСЋ!\n",
+            "РљСѓРґР° Р±С‹ СѓРґР°СЂРёС‚СЊ?\n",
+            "РќР°РєРѕРЅРµС† РјРѕСЏ РѕС‡РµСЂРµРґСЊ\n",
+            "РџРѕРїР°РґСѓ РёР»Рё РїСЂРѕРјР°Р¶Сѓ?\n"
             });
     }
     auto seq = MyVariables.GetSequence();
@@ -359,8 +359,8 @@ void StAlice(const Alice::Request& request, Alice::Response& response,
         if (dif > 3)
         {
             tts = ChooseRandomString(MyVariables.GetGen(),
-                { "\nЯ случайно\n",
-                "\nНу, что, в лотерею?\n",
+                { "\nРЇ СЃР»СѓС‡Р°Р№РЅРѕ\n",
+                "\nРќСѓ, С‡С‚Рѕ, РІ Р»РѕС‚РµСЂРµСЋ?\n",
                 "\nEouf\n",
                 "\n...\n"
                 });
@@ -368,85 +368,85 @@ void StAlice(const Alice::Request& request, Alice::Response& response,
         else if (dif == 3)
         {
             tts = ChooseRandomString(MyVariables.GetGen(),
-                { "\nТри!\n",
-                "\nМожет сразу сдашься?\n",
-                "\nУ меня бы отпало желание играть\n",
-                "\nМне неслыханно везет\n",
-                "\nЧто за...\n"
+                { "\nРўСЂРё!\n",
+                "\nРњРѕР¶РµС‚ СЃСЂР°Р·Сѓ СЃРґР°С€СЊСЃСЏ?\n",
+                "\nРЈ РјРµРЅСЏ Р±С‹ РѕС‚РїР°Р»Рѕ Р¶РµР»Р°РЅРёРµ РёРіСЂР°С‚СЊ\n",
+                "\nРњРЅРµ РЅРµСЃР»С‹С…Р°РЅРЅРѕ РІРµР·РµС‚\n",
+                "\nР§С‚Рѕ Р·Р°...\n"
                 });
         }
         else if (dif == 2)
         {
             tts = ChooseRandomString(MyVariables.GetGen(),
-                { "\nДва!\n",
-                "\nДабл!\n",
-                "\nАхахах\n",
-                "\nЯ ненарочно\n",
-                "\nКажется я никогда не промахиваюсь\n"
+                { "\nР”РІР°!\n",
+                "\nР”Р°Р±Р»!\n",
+                "\nРђС…Р°С…Р°С…\n",
+                "\nРЇ РЅРµРЅР°СЂРѕС‡РЅРѕ\n",
+                "\nРљР°Р¶РµС‚СЃСЏ СЏ РЅРёРєРѕРіРґР° РЅРµ РїСЂРѕРјР°С…РёРІР°СЋСЃСЊ\n"
                 });
         }
         else
         {
             tts = ChooseRandomString(MyVariables.GetGen(),
-                { "\nНу, хоть один\n",
-                "\nУбила!\n",
-                "\nБез шансов\n",
-                "\nУдачно\n",
-                "\nКораблик к кораблику...\n"
+                { "\nРќСѓ, С…РѕС‚СЊ РѕРґРёРЅ\n",
+                "\nРЈР±РёР»Р°!\n",
+                "\nР‘РµР· С€Р°РЅСЃРѕРІ\n",
+                "\nРЈРґР°С‡РЅРѕ\n",
+                "\nРљРѕСЂР°Р±Р»РёРє Рє РєРѕСЂР°Р±Р»РёРєСѓ...\n"
                 });
         }
     }
     else if (MyVariables.GetUser().TotalHealth() < health)
     {
         tts = ChooseRandomString(MyVariables.GetGen(),
-            { "\nКажется, попала!\n",
-            "\nЯ попала\n",
-            "\nПопадание!\n",
-            "\nВ точку\n",
-            "\nВ яблочко\n",
-            "\nРанила!\n",
-            "\nПрямое попадание!\n"
+            { "\nРљР°Р¶РµС‚СЃСЏ, РїРѕРїР°Р»Р°!\n",
+            "\nРЇ РїРѕРїР°Р»Р°\n",
+            "\nРџРѕРїР°РґР°РЅРёРµ!\n",
+            "\nР’ С‚РѕС‡РєСѓ\n",
+            "\nР’ СЏР±Р»РѕС‡РєРѕ\n",
+            "\nР Р°РЅРёР»Р°!\n",
+            "\nРџСЂСЏРјРѕРµ РїРѕРїР°РґР°РЅРёРµ!\n"
             });
     }
     else
     {
         tts = ChooseRandomString(MyVariables.GetGen(),
-            { "\nПромах\n",
-            "\nОбидно\n",
-            "\nВ следующий раз попаду\n",
-            "\nЭх\n",
-            "\nОбидный промах\n"
+            { "\nРџСЂРѕРјР°С…\n",
+            "\nРћР±РёРґРЅРѕ\n",
+            "\nР’ СЃР»РµРґСѓСЋС‰РёР№ СЂР°Р· РїРѕРїР°РґСѓ\n",
+            "\nР­С…\n",
+            "\nРћР±РёРґРЅС‹Р№ РїСЂРѕРјР°С…\n"
             });
     }
     if (MyVariables.GetUser().IsLoser())
     {
         std::string ttsA = ChooseRandomString(MyVariables.GetGen(),
-            { "\nТы проиграл!\n",
-            "\nКораблей не осталось, я выиграла!\n",
-            "\nЯ выиграла!",
-            "\nХороший бой, но победа за мной\n",
-            "\nПобеда за мной!",
-            "\nЭто было просто. Я победила\n"
+            { "\nРўС‹ РїСЂРѕРёРіСЂР°Р»!\n",
+            "\nРљРѕСЂР°Р±Р»РµР№ РЅРµ РѕСЃС‚Р°Р»РѕСЃСЊ, СЏ РІС‹РёРіСЂР°Р»Р°!\n",
+            "\nРЇ РІС‹РёРіСЂР°Р»Р°!",
+            "\nРҐРѕСЂРѕС€РёР№ Р±РѕР№, РЅРѕ РїРѕР±РµРґР° Р·Р° РјРЅРѕР№\n",
+            "\nРџРѕР±РµРґР° Р·Р° РјРЅРѕР№!",
+            "\nР­С‚Рѕ Р±С‹Р»Рѕ РїСЂРѕСЃС‚Рѕ. РЇ РїРѕР±РµРґРёР»Р°\n"
             });
         ttsA += ChooseRandomString(MyVariables.GetGen(),
-            { "\nСыграем еще раз?\n",
-            "\nХочешь сыграть еще раз?\n",
-            "\nДавай сыграем еще раз!\n",
-            "\nДавай еще!\n",
-            "\nМожет еще разок?",
-            "\nДавай еще разок. Ну пожалуйста!\n"
+            { "\nРЎС‹РіСЂР°РµРј РµС‰Рµ СЂР°Р·?\n",
+            "\nРҐРѕС‡РµС€СЊ СЃС‹РіСЂР°С‚СЊ РµС‰Рµ СЂР°Р·?\n",
+            "\nР”Р°РІР°Р№ СЃС‹РіСЂР°РµРј РµС‰Рµ СЂР°Р·!\n",
+            "\nР”Р°РІР°Р№ РµС‰Рµ!\n",
+            "\nРњРѕР¶РµС‚ РµС‰Рµ СЂР°Р·РѕРє?",
+            "\nР”Р°РІР°Р№ РµС‰Рµ СЂР°Р·РѕРє. РќСѓ РїРѕР¶Р°Р»СѓР№СЃС‚Р°!\n"
             });
         std::string resp = ChooseRandomString(MyVariables.GetGen(),
-            { "\nГо!\n",
-            "\nДавай!\n",
-            "\nПойдем\n"
+            { "\nР“Рѕ!\n",
+            "\nР”Р°РІР°Р№!\n",
+            "\nРџРѕР№РґРµРј\n"
             });
         Alice::Button Boop(resp, { "Y" }, true);
         response.PushButton(Boop);
         std::string noresp = ChooseRandomString(MyVariables.GetGen(),
-            { "\nНет!\n",
-            "\nТолько не еще раз!\n",
-            "\nНет уж!\n"
+            { "\nРќРµС‚!\n",
+            "\nРўРѕР»СЊРєРѕ РЅРµ РµС‰Рµ СЂР°Р·!\n",
+            "\nРќРµС‚ СѓР¶!\n"
             });
         Alice::Button NotBoop(noresp, { "N" }, true);
         response.PushButton(NotBoop);
@@ -457,12 +457,12 @@ void StAlice(const Alice::Request& request, Alice::Response& response,
     }
     std::string fieldA = MyVariables.GetBot().OuterToString();
     std::string ttsA = ChooseRandomString(MyVariables.GetGen(),
-        { "\nКуда стрелять?",
-        "\nКуда бить?",
-        "\nКуда ударить?",
-        "\nПо какой позиции ударить?",
-        "\nПо какой позиции бить?",
-        "\nПо какой позиции стрелять?"
+        { "\nРљСѓРґР° СЃС‚СЂРµР»СЏС‚СЊ?",
+        "\nРљСѓРґР° Р±РёС‚СЊ?",
+        "\nРљСѓРґР° СѓРґР°СЂРёС‚СЊ?",
+        "\nРџРѕ РєР°РєРѕР№ РїРѕР·РёС†РёРё СѓРґР°СЂРёС‚СЊ?",
+        "\nРџРѕ РєР°РєРѕР№ РїРѕР·РёС†РёРё Р±РёС‚СЊ?",
+        "\nРџРѕ РєР°РєРѕР№ РїРѕР·РёС†РёРё СЃС‚СЂРµР»СЏС‚СЊ?"
         });
     response.SetTts(tmp + tts + ttsA);
     response.SetText(tmp + field + tts + fieldA + ttsA);
@@ -480,49 +480,49 @@ void StPlayer(const Alice::Request& request, Alice::Response& response,
         {
             if (!tmp.empty() && MyVariables.GetBot().IsDead(tmp))
             {
-                tmp += " уничтожен!\n";
+                tmp += " СѓРЅРёС‡С‚РѕР¶РµРЅ!\n";
                 tmp += ChooseRandomString(MyVariables.GetGen(),
-                    { "\nКуда стрелять?",
-                    "\nКуда бить?",
-                    "\nКуда ударить?",
-                    "\nПо какой позиции ударить?",
-                    "\nПо какой позиции бить?",
-                    "\nПо какой позиции стрелять?"
+                    { "\nРљСѓРґР° СЃС‚СЂРµР»СЏС‚СЊ?",
+                    "\nРљСѓРґР° Р±РёС‚СЊ?",
+                    "\nРљСѓРґР° СѓРґР°СЂРёС‚СЊ?",
+                    "\nРџРѕ РєР°РєРѕР№ РїРѕР·РёС†РёРё СѓРґР°СЂРёС‚СЊ?",
+                    "\nРџРѕ РєР°РєРѕР№ РїРѕР·РёС†РёРё Р±РёС‚СЊ?",
+                    "\nРџРѕ РєР°РєРѕР№ РїРѕР·РёС†РёРё СЃС‚СЂРµР»СЏС‚СЊ?"
                     });
                 response.SetText(tmp);
                 response.SetTts(tmp);
                 return;
             }
-            tmp = "Попадание!\n";
+            tmp = "РџРѕРїР°РґР°РЅРёРµ!\n";
             tmp += ChooseRandomString(MyVariables.GetGen(),
-                { "\nКуда стрелять?",
-                "\nКуда бить?",
-                "\nКуда ударить?",
-                "\nПо какой позиции ударить?",
-                "\nПо какой позиции бить?",
-                "\nПо какой позиции стрелять?"
+                { "\nРљСѓРґР° СЃС‚СЂРµР»СЏС‚СЊ?",
+                "\nРљСѓРґР° Р±РёС‚СЊ?",
+                "\nРљСѓРґР° СѓРґР°СЂРёС‚СЊ?",
+                "\nРџРѕ РєР°РєРѕР№ РїРѕР·РёС†РёРё СѓРґР°СЂРёС‚СЊ?",
+                "\nРџРѕ РєР°РєРѕР№ РїРѕР·РёС†РёРё Р±РёС‚СЊ?",
+                "\nРџРѕ РєР°РєРѕР№ РїРѕР·РёС†РёРё СЃС‚СЂРµР»СЏС‚СЊ?"
                 });
             response.SetText(tmp);
             response.SetTts(tmp);
             return;
         }
-        tmp = "Промах!\n";
+        tmp = "РџСЂРѕРјР°С…!\n";
         response.SetText(tmp);
         response.SetTts(tmp);
-        Alice::Button Boop("Эх!", { "useless_button" }, true);
+        Alice::Button Boop("Р­С…!", { "useless_button" }, true);
         response.PushButton(Boop);
         MyVariables.SetStage(ALICE);
         return;
     }
     std::mt19937 gen(info.second);
     std::string tmp = ChooseRandomString(gen,
-        { "Еще раз?\n",
-        "Сложно. Еще раз?\n",
-        "Что-что?\n",
-        "А стрелять-то куда?\n",
-        "Еще разок можно?\n",
-        "А? Я прослушала, простите\n",
-        "Что?\n"
+        { "Р•С‰Рµ СЂР°Р·?\n",
+        "РЎР»РѕР¶РЅРѕ. Р•С‰Рµ СЂР°Р·?\n",
+        "Р§С‚Рѕ-С‡С‚Рѕ?\n",
+        "Рђ СЃС‚СЂРµР»СЏС‚СЊ-С‚Рѕ РєСѓРґР°?\n",
+        "Р•С‰Рµ СЂР°Р·РѕРє РјРѕР¶РЅРѕ?\n",
+        "Рђ? РЇ РїСЂРѕСЃР»СѓС€Р°Р»Р°, РїСЂРѕСЃС‚РёС‚Рµ\n",
+        "Р§С‚Рѕ?\n"
         });
     response.SetText(tmp);
     response.SetTts(tmp);
@@ -535,9 +535,9 @@ void StTryAgain(const Alice::Request& request, Alice::Response& response,
     if (tmp == "Y")
     {
         tmp = ChooseRandomString(gen,
-            { "Как тебя теперь будут звать?",
-            "Выбирай новый псевдоним",
-            "Каким будет новое имя?"
+            { "РљР°Рє С‚РµР±СЏ С‚РµРїРµСЂСЊ Р±СѓРґСѓС‚ Р·РІР°С‚СЊ?",
+            "Р’С‹Р±РёСЂР°Р№ РЅРѕРІС‹Р№ РїСЃРµРІРґРѕРЅРёРј",
+            "РљР°РєРёРј Р±СѓРґРµС‚ РЅРѕРІРѕРµ РёРјСЏ?"
             });
         response.SetTts(tmp);
         response.SetText(tmp);
@@ -546,9 +546,9 @@ void StTryAgain(const Alice::Request& request, Alice::Response& response,
         return;
     }
     tmp = ChooseRandomString(gen,
-        { "Ну и ладно. Пока!",
-        "До свидания",
-        "До встречи"
+        { "РќСѓ Рё Р»Р°РґРЅРѕ. РџРѕРєР°!",
+        "Р”Рѕ СЃРІРёРґР°РЅРёСЏ",
+        "Р”Рѕ РІСЃС‚СЂРµС‡Рё"
         });
     response.SetTts(tmp);
     response.SetText(tmp);
