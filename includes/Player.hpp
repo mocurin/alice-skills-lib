@@ -199,6 +199,7 @@ public:
             result += '\n';
             ++number;
         }
+        return result;
     }
     std::string OuterToString() {
         char letter = '@';
@@ -220,6 +221,7 @@ public:
             result += '\n';
             ++number;
         }
+        return result;
     }
     std::string TargetedToString(const Tile& pos) {
         char letter = '@';
@@ -246,6 +248,7 @@ public:
             result += '\n';
             ++number;
         }
+        return result;
     }
 // UTILITY
     std::string ShipName(const Tile& pos) {
@@ -289,7 +292,7 @@ public:
                 {
                     spos = PickRand();
                     epos = ThrowRand(spos, distance);
-                } while (epos == std::make_pair(10u, 10u));
+                } while (epos.first == 10 || epos.second == 10);
                 Ships.emplace(name, BuildShip(spos, epos));
                 MarkShip(name);
                 ++name.back();
