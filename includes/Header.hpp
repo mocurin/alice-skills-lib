@@ -1,127 +1,119 @@
 #pragma once
-#include "Board.hpp"
+#include "Player.hpp"
 #include <Request.hpp>
 #include <Response.hpp>
 #include <Skill.hpp>
-#include <algorithm>
 #include <fstream>
 
 enum stages { NAME, GREET, PLACEMENT, MANUAL, MANUAL2, DECIDE, BEGIN, PLAYER, ALICE, TRYAGAIN };
 
-std::pair<stages, size_t> ReadStageAndGen();
 void SaveStageAndGen(const stages& stage, const size_t& seedy);
-void SaveString(const std::string& str);
-void ClearFiles();
-void Trim(std::string& str);
-std::string LoadString();
+std::pair<stages, size_t> ReadStageAndGen();
+std::string ChooseRandomString(std::mt19937& gen, const std::vector<std::string>& replics);
 std::string Cut(const std::string& str);
-std::string ChooseRandomString(std::mt19937& gen, const std::vector<std::string>& quotes);
-std::pair<size_t, size_t> DivideBySpace(const std::string& str);
-std::pair<size_t, size_t> GetPos(const std::string& request);
-bool SameLine(const std::pair<size_t, size_t>& pos1, const std::pair<size_t, size_t>& pos2);
-bool CheckSize(const std::pair<size_t, size_t>& pos1, const std::pair<size_t, size_t>& pos2);
+Tile DivideBySpace(const std::string& str);
+Tile GetPos(const std::string& request);
+void ClearFiles();
 
-class Case
-{
+class Case {
 private:
-    std::size_t stage_;
-    Board player_;
-    Board bot_;
-    std::pair<size_t, size_t> pos_;
-    std::pair<size_t, std::mt19937> gen_;
-    std::pair<std::vector<std::pair<size_t, size_t>>, size_t> tracking_;
+    Player User;
+    Player Bot;
+    size_t Stage;
+    Tile Position;
+    struct Engine {
+        size_t Seed;
+        std::mt19937 Body;
+    } Generator;
+    std::vector<Tile> Possible;
+    std::vector<Tile> Hits;
 public:
-    Case(const std::pair<stages, size_t>& info, const std::string& tmp)
-    {
-        Board Player(tmp, info.second);
-        player_ = Player;
-        Board Bot("Alice", info.second);
+    Case(const std::pair<stages, size_t>& info, const std::string& tmp) {
+        Player user(tmp, info.second);
+        User = user;
+        Player bot("Alice", info.second);
         Bot.RandomScenario();
-        bot_ = Bot;
-        pos_ = { 0, 0 };
-        stage_ = info.first;
+        Bot = bot;
+        Position = { 0u, 0u };
+        Stage = info.first;
         SetGen(info.second);
-        tracking_ = { {}, 0 };
     }
-
-    Case()
-    {
+    Case() {
         auto pair = ReadStageAndGen();
-        stage_ = pair.first;
+        Stage = pair.first;
         SetGen(pair.second);
         ReadFromFile();
     }
-
-    ~Case()
-    {
+    ~Case() {
         SaveStageAndGen();
         SaveToFile();
     }
-
-    Board& GetPlayer() { return player_; }
-
-    Board& GetBot() { return bot_; }
-
-    std::pair<std::vector<std::pair<size_t, size_t>>, size_t>& GetTracking() { return tracking_; }
-
-    std::pair<size_t, size_t>& GetPos() { return pos_; }
-
-    std::mt19937& GetGen() { return gen_.second; }
-
-    void SetStage(const stages& stage)
-    {
-        stage_ = stage;
+    Player& GetUser() { return User; }
+    Player& GetBot() { return Bot; }
+    Tile GetPos() { return Position; }
+    std::mt19937& GetGen() { return Generator.Body; }
+    std::pair<std::vector<Tile>, std::vector<Tile>> GetSequence() {
+        return { Possible, Hits };
     }
-
-    void SetGen(const size_t& seedy)
-    {
-        std::mt19937 gen(seedy);
-        gen_ = { seedy, gen };
+    void SetSequence(const std::pair<std::vector<Tile>, std::vector<Tile>>& seq) {
+        Possible = seq.first;
+        Hits = seq.second;
     }
-
-    void SetPos(const std::pair<size_t, size_t>& pos) { pos_ = pos; }
-
+    void SetStage(const stages& stage) { Stage = stage; }
+    void SetGen(const size_t& seed) {
+        std::mt19937 generator(seed);
+        Generator = { seed, generator };
+    }
+    void SetPos(const std::pair<size_t, size_t>& pos) { Position = pos; }
     void SaveStageAndGen()
     {
-        std::ofstream out("./STAGE.txt");
-        out << stage_ << std::endl;
-        out << gen_.first << std::endl;
+        std::ofstream out("data/STAGE.txt");
+        out << Stage << std::endl;
+        out << Generator.Seed << std::endl;
+        out.close();
     }
-
-    void SaveToFile()
-    {
-        std::ofstream out("./DATA.txt");
-        out << player_;
-        out << bot_;
-        out << pos_.first << ' ' << pos_.second << std::endl;
-        out << tracking_.first.size() << std::endl;
-        for (const auto& i : tracking_.first)
-        {
-            out << i.first << ' ' << i.second << std::endl;
+    void SaveToFile() {
+        std::ofstream out("data/DATA.txt");
+        if (out.is_open()) {
+            out << User;
+            out << Bot;
+            out << Position.first << ' ' << Position.second << std::endl;
+            out << Possible.size() << std::endl;
+            for (const auto& i : Possible)
+            {
+                out << i.first << ' ' << i.second << std::endl;
+            }
+            out << Hits.size() << std::endl;
+            for (const auto& i : Hits)
+            {
+                out << i.first << ' ' << i.second << std::endl;
+            }
         }
-        out << tracking_.second << std::endl;
+        out.close();
     }
-
-    void ReadFromFile()
-    {
-        std::ifstream in("./DATA.txt");
-        in >> player_;
-        in >> bot_;
-        std::string str;
-        getline(in, str);
-        pos_ = DivideBySpace(str);
-        getline(in, str);
-        size_t size = std::stoul(str);
-        if (size == 0)
-        {
-            tracking_.first = {};
-        }
-        for (size_t i = 0; i < size; ++i)
-        {
+    void ReadFromFile() {
+        std::ifstream in("data/DATA.txt");
+        if (in.is_open()) {
+            in >> User;
+            in >> Bot;
+            std::string str;
             getline(in, str);
-            tracking_.first.push_back(DivideBySpace(str));
+            Position = DivideBySpace(str);
+            getline(in, str);
+            Possible.resize(std::stoi(str));
+            for (auto& i : Possible)
+            {
+                getline(in, str);
+                i = DivideBySpace(str);
+            }
+            getline(in, str);
+            Hits.resize(std::stoi(str));
+            for (auto& i : Hits)
+            {
+                getline(in, str);
+                i = DivideBySpace(str);
+            }
         }
-        getline(in, str);
-        tracking_.second = std::stoul(str);
+        in.close();
     }
 };
