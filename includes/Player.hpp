@@ -23,6 +23,7 @@ bool IsOutOfBorders(const Tile& pos);
 bool IsProperSized(const Tile& spos, const Tile& epos);
 bool IsProperPlaced(const Tile& spos, const Tile& epos);
 size_t ShipSize(const Tile& spos, const Tile& epos);
+Tile StrToPair(const std::string& str);
 
 class Player {
 private:
@@ -32,34 +33,14 @@ private:
         Board Inner;
     } Boards;
     std::map<std::string, Ship> Ships;
-    struct Engine {
-        size_t Seed;
-        std::mt19937 Body;
-    } Generator;
+    std::mt19937* Gen;
 
-    Board GetOuter() { return Boards.Outer; }
-    Board GetInner() { return Boards.Inner; }
-    void SetName(const std::string& name) { Name = name; }
-    void SetGen(const size_t& seed) {
-        Generator.Seed = seed;
-        std::mt19937 generator(seed);
-        Generator.Body = generator;
-    }
-    void SetShips(std::map<std::string, Ship> ships) {
-        Ships = ships;
-    }
-    void SetInnerBoard(const Board& board) {
-        Boards.Inner = board;
-    }
-    void SetOuterBoard(const Board& board) {
-        Boards.Outer = board;
-    }
     void FillOuter(const char& symbol) {
         for (auto& i : Boards.Outer)
             i.fill(symbol);
     }
     void FillInner(const char& symbol) {
-        for (auto& i : Boards.Outer)
+        for (auto& i : Boards.Inner)
             i.fill(symbol);
     }
     void MarkShip(const std::string& name) {
@@ -69,17 +50,16 @@ private:
 // GENERATION
     Tile PickRand() {
         std::uniform_int_distribution<> range(0, 9);
-        Tile pos = { range(Generator.Body), range(Generator.Body) };
+        Tile pos = { range(*Gen), range(*Gen) };
         while (!IsProperForPlacement(pos))
-            pos = { range(Generator.Body), range(Generator.Body) };
+            pos = { range(*Gen), range(*Gen) };
         return pos;
     }
     Tile ThrowRand(const Tile& prev, const size_t& jump) {
         std::uniform_int_distribution<> directions(0, 3);
         Tile thrown = { 0, 0 };
-        for (size_t k = 0, i = directions(Generator.Body); k < 4;
+        for (size_t k = 0, i = directions(*Gen); k < 4;
             ++k, ++i %= 4) {
-
             switch (i) {
             case 0:
                 thrown = { prev.first - jump, prev.second };
@@ -101,18 +81,19 @@ private:
     }
     Ship BuildShip(const Tile& spos, const Tile& epos) {
         std::vector<Tile> positions;
-        size_t size = 0;
+        size_t size = ShipSize(spos, epos);
+        Tile lower = spos;
         if (spos.first == epos.first) {
-            size = std::abs(
-                static_cast<int>(spos.second) - static_cast<int>(epos.second));
+            if (spos.second > epos.second)
+                lower = epos;
             for (size_t i = 0; i < size; ++i)
-                positions.push_back({spos.first, spos.second + i});
+                positions.push_back({lower.first, lower.second + i});
         }
         else if (spos.second == epos.second) {
-            size = std::abs(
-                static_cast<int>(spos.first) - static_cast<int>(epos.first));
+            if (spos.first > epos.first)
+                lower = epos;
             for (size_t i = 0; i < size; ++i)
-                positions.push_back({ spos.first + i, spos.second });
+                positions.push_back({ lower.first + i, lower.second });
         }
         Ship ship = { positions, size };
         return ship;
@@ -121,10 +102,9 @@ private:
     void Destroy(const std::string& name) {
         Tile pos = Ships[name].Positions.front();
         --pos.first;
-        for (size_t i = 0; i < 3; ++i) {
-            if (pos.first + i > 9)
+        for (size_t i = 0; i < 3; ++i, ++pos.first) {
+            if (pos.first > 9)
                 continue;
-            pos.first += i;
             if (pos.second - 1 < 10)
                 Boards.Outer[pos.first][pos.second - 1] = 'x';
             Boards.Outer[pos.first][pos.second] = 'x';
@@ -134,10 +114,9 @@ private:
         if (Ships[name].Positions.size() != 1) {
             pos = Ships[name].Positions.back();
             --pos.first;
-            for (size_t i = 0; i < 3; ++i) {
-                if (pos.first + i > 9)
+            for (size_t i = 0; i < 3; ++i, ++pos.first) {
+                if (pos.first > 9)
                     continue;
-                pos.first += i;
                 if (pos.second - 1 < 10)
                     Boards.Outer[pos.first][pos.second - 1] = 'x';
                 Boards.Outer[pos.first][pos.second] = 'x';
@@ -146,34 +125,44 @@ private:
             }
         }
         for (const auto& i : Ships[name].Positions) {
-            Boards.Outer[i.first][i.second] = 'X';
+            Boards.Outer[i.first][i.second] = 'D';
         }
     }
 public:
-    Player(const std::string& name, const size_t& seed) {
+    Player(const std::string& name, std::mt19937* generator) {
         Name = name;
         FillOuter('~');
         FillInner('~');
-        Generator.Seed = seed;
-        std::mt19937 generator(seed);
-        Generator.Body = generator;
+        Gen = generator;
     }
-    Player(const std::string& name) : Player(name, static_cast<size_t>(time(0))) {}
-    Player(const size_t& seed) : Player("Noname", seed) {}
-    Player() : Player("Noname") {}
-    ~Player();
+    Player(std::mt19937* generator) : Player("nan", generator) {}
+    Player(const std::string& name) : Player(name, nullptr) {}
+    Player() : Player("nan", nullptr) {} 
+    ~Player() {}
     Player& operator=(Player& player)
     {
         Name = player.Name;
         Boards.Inner = player.Boards.Inner;
         Boards.Outer = player.Boards.Outer;
         Ships = player.Ships;
-        Generator.Seed = player.Generator.Seed;
-        Generator.Body = player.Generator.Body;
+        Gen = player.Gen;
         return *this;
     }
+    void SetShips(std::map<std::string, Ship> ships) {
+        Ships = ships;
+    }
+    void SetInnerBoard(const Board& board) {
+        Boards.Inner = board;
+    }
+    void SetOuterBoard(const Board& board) {
+        Boards.Outer = board;
+    }
+    void SetName(const std::string& name) { Name = name; }
+    void SetGen(std::mt19937* generator) { Gen = generator; }
+    Board GetOuter() { return Boards.Outer; }
+    Board GetInner() { return Boards.Inner; }
     std::string GetName() { return Name; }
-    std::mt19937 GetGenerator() { return Generator.Body; }
+    std::mt19937 GetGenerator() { return *Gen; }
     friend std::istream& operator>>(std::istream& is, Board& board);
     friend std::ostream& operator<<(std::ostream& os, const Board& board);
     friend std::istream& operator>>(std::istream& is, Player& player);
@@ -190,7 +179,7 @@ public:
         }
         result += '\n';
         for (const auto& i : Boards.Inner) {
-            result += static_cast<char>(number - '0');
+            result += static_cast<char>('0' + number);
             result += ' ';
             for (const auto& k : i) {
                 result += k;
@@ -212,7 +201,7 @@ public:
         }
         result += '\n';
         for (const auto& i : Boards.Outer) {
-            result += static_cast<char>(number - '0');
+            result += static_cast<char>('0' + number);
             result += ' ';
             for (const auto& k : i) {
                 result += k;
@@ -256,6 +245,7 @@ public:
             for (const auto& k : i.second.Positions)
                 if (k == pos)
                     return i.first;
+        return "";
     }
     size_t ShipsAmount(const size_t& size) {
         size_t amount = 0;
@@ -300,7 +290,7 @@ public:
             name.resize(distance);
             --distance;
             ++edge;
-        } while (distance != 0);
+        } while (distance < 4);
     }
     void Place(const Tile& spos, const Tile& epos) {
         std::string name;
@@ -313,33 +303,36 @@ public:
 // BATTLE
     bool Shoot(const Tile& pos) {
         if (Boards.Inner[pos.first][pos.second] == 'X') {
+            Boards.Outer[pos.first][pos.second] = 'S';
             auto name = ShipName(pos);
             --Ships[name].Health;
             if (Ships[name].Health == 0)
                 Destroy(name);
             return true;
         }
+        Boards.Outer[pos.first][pos.second] = 'x';
         return false;
     }
 // CHECKS
     bool IsProperForPlacement(const Tile& pos) {
         if (IsOutOfBorders(pos))
             return false;
-        size_t x = pos.first - 1;
-        for (size_t i = 0; i < 3; ++i, ++x) {
+        for (size_t i = 0, x = pos.first - 1; i < 3; ++i, ++x) {
             if (x > 9)
                 continue;
-            if (Boards.Inner[x][pos.second - 1] == 'S' ||
-                Boards.Inner[x][pos.second] == 'S' ||
-                Boards.Inner[x][pos.second + 1] == 'S')
-                return false;
+            for (size_t k = 0, y = pos.second - 1; k < 3; ++k, ++y) {
+                if (y > 9)
+                    continue;
+                if (Boards.Inner[x][y] == 'X')
+                    return false;
+            }
         }
         return true;
     }
     bool IsNeeded(const Tile& spos, const Tile& epos) {
         size_t size = ShipSize(spos, epos);
         size_t amount = ShipsAmount(size);
-        return amount < (size + amount) % 5;
+        return amount + size < 5;
     }
     bool IsDead(const std::string& name) {
         return Ships[name].Health == 0;
@@ -352,7 +345,8 @@ public:
     }
     bool WasShot(const Tile& pos) {
         return Boards.Outer[pos.first][pos.second] == 'x' ||
-            Boards.Outer[pos.first][pos.second] == 'S';
+            Boards.Outer[pos.first][pos.second] == 'S' ||
+            Boards.Outer[pos.first][pos.second] == 'D';
     }
 // AI
     std::vector<Tile> GeneratePossible(const Tile& pos) {
@@ -368,53 +362,62 @@ public:
         return possible;
     }
     std::pair<std::vector<Tile>, std::vector<Tile>> ShootRand() {
+        if (IsLoser())
+            return { {}, {} };
         std::uniform_int_distribution<> range(0, 9);
-        Tile pos = { range(Generator.Body), range(Generator.Body) };
-        while (WasShot(pos))
-            pos = { range(Generator.Body), range(Generator.Body) };
+        Tile pos = { range(*Gen), range(*Gen) };
+        while (WasShot(pos)) {
+            pos = { range(*Gen), range(*Gen) };
+        }
         if (Shoot(pos)) {
             if (Ships[ShipName(pos)].Health == 0)
                 return ShootRand();
             auto possible = GeneratePossible(pos);
             return ContinueShooting(possible, { pos });
         }
-        return { {}, { pos } };
+        return { {}, {} };
     }
     std::pair<std::vector<Tile>, std::vector<Tile>> ContinueShooting(
         const std::vector<Tile>& possible, const std::vector<Tile>& hits) {
-        std::uniform_int_distribution<> range(0, possible.size() - 1);
-        size_t num = range(Generator.Body);
+        size_t num = 0;
+        if (possible.size() > 1) {
+            std::uniform_int_distribution<> range(0, possible.size() - 1);
+            num = range(*Gen);
+        }
         std::vector<Tile> result;
         if (Shoot(possible[num])) {
-            if (Ships[ShipName(possible[num])].Health == 0) {
+            if (Ships[ShipName(possible[num])].Health == 0)
                 return ShootRand();
-            }
-            std::vector<Tile> sucess;
+            std::vector<Tile> sucess = hits;
             if (hits.front().first == possible[num].first) {
+                if (possible[num].second > hits.back().second)
+                    sucess.push_back(possible[num]);
                 if (possible[num].second < hits.front().second)
-                    sucess = { possible[num], hits.front() };
-                else
-                    sucess = { hits.front(), possible[num] };
-                if (sucess.front().second - 1 < 10)
+                    sucess.insert(sucess.begin(), possible[num]);
+                if (sucess.front().second - 1 < 10 &&
+                    !WasShot({ sucess.front().first, sucess.front().second - 1 }))
                     result.push_back({ sucess.front().first, sucess.front().second - 1 });
-                if (sucess.back().second + 1 < 10)
+                if (sucess.back().second + 1 < 10 &&
+                    !WasShot({ sucess.back().first, sucess.back().second + 1 }))
                     result.push_back({ sucess.back().first, sucess.back().second + 1 });
                 return ContinueShooting(result, sucess);
             }
             if (hits.front().second == possible[num].second) {
+                if (possible[num].first > hits.back().first)
+                    sucess.push_back(possible[num]);
                 if (possible[num].first < hits.front().first)
-                    sucess = { possible[num], hits.front() };
-                else
-                    sucess = { hits.front(), possible[num] };
-                if (sucess.front().first - 1 < 10)
+                    sucess.insert(sucess.begin(), possible[num]);
+                if (sucess.front().first - 1 < 10 &&
+                    !WasShot({ sucess.front().first - 1, sucess.front().second }))
                     result.push_back({ sucess.front().first - 1, sucess.front().second });
-                if (sucess.back().first + 1 < 10)
+                if (sucess.back().first + 1 < 10 &&
+                    !WasShot({ sucess.back().first + 1, sucess.back().second }))
                     result.push_back({ sucess.back().first + 1, sucess.back().second });
                 return ContinueShooting(result, sucess);
             }
         }
         result = possible;
-        std::swap(result.back(), result[num]);
+        std::swap(result[num], result.back());
         result.pop_back();
         return { result, hits };
     }
