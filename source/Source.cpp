@@ -1,4 +1,7 @@
 #include "Header.hpp"
+#include <Request.hpp>
+#include <Response.hpp>
+#include <Skill.hpp>
 
 void HandleEmpty(const Alice::Request& request, Alice::Response& response)
 {
