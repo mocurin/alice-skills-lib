@@ -103,7 +103,8 @@ size_t ShipSize(const Tile& spos, const Tile& epos) {
 }
 
 Tile StrToPair(const std::string& str) {
-    if (str.length() == 2)
+    if (str.length() == 2) {
         return { str.front() - '0', str.back() - '0' };
+    }
 	return { 0, 0 };
 }
