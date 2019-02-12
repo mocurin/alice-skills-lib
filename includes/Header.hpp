@@ -1,83 +1,117 @@
 #pragma once
 #include "Player.hpp"
 #include <fstream>
+#include <cstdio>
 
-enum stages { NAME, GREET, PLACEMENT, MANUAL, MANUAL2, DECIDE, BEGIN, PLAYER, ALICE, TRYAGAIN };
+enum stages { NAME, GREET, PLACEMENT, MANUAL, MANUAL1, MANUAL2, DECIDE1, DECIDE2, BEGIN, PLAYER, ALICE, TRYAGAIN};
 
-const std::string folder = "data/";
-
-void SaveStageAndGen(const stages& stage, const size_t& seedy);
-std::pair<stages, size_t> ReadStageAndGen();
 std::string ChooseRandomString(std::mt19937& gen, const std::vector<std::string>& replics);
 std::string Cut(const std::string& str);
-Tile DivideBySpace(const std::string& str);
 Tile GetPos(const std::string& request);
-void ClearFiles();
 
-class Case {
+void ClearFiles(const std::string& sessionId) {
+    std::string tmp = sessionId + "STATE.txt";
+    std::remove(tmp.c_str());
+    tmp = sessionId + "DATA.txt";
+    std::remove(tmp.c_str());
+}
+
+class State {
 private:
-    Player User;
-    Player Bot;
     size_t Stage;
-    Tile Position;
+    std::string SessionId;
     struct Engine {
         size_t Seed;
         std::mt19937 Body;
     } Generator;
-    std::vector<Tile> Possible;
-    std::vector<Tile> Hits;
+
+    void InitiateBegin(const std::string& sessionId) {
+        Stage = NAME;
+        SessionId = sessionId;
+        Generator.Seed = static_cast<size_t>(time(0));
+        Generator.Body.seed(Generator.Seed);
+    }
+
 public:
-    Case(const std::pair<stages, size_t>& info, const std::string& username) {
-        Stage = info.first;
-        SetGen(info.second);
-        User.SetName(username);
-        User.SetGen(&Generator.Body);
-        Bot.SetName("Alice");
-        Bot.SetGen(&Generator.Body);
-        Bot.RandomScenario();
-        Position = { 0u, 0u };
+    State() {}
+
+    State(const std::string& sessionId) {
+        std::ifstream in(sessionId + "STATE.txt");
+        if (!in.is_open() || in.peek() == std::ifstream::traits_type::eof())
+            InitiateBegin(sessionId);
+        std::string tmp;
+        getline(in, tmp);
+        Stage = static_cast<stages>(std::stoul(tmp));
+        getline(in, tmp);
+        SessionId = tmp;
+        getline(in, tmp);
+        Generator.Seed = std::stoul(tmp);
+        Generator.Body.seed(Generator.Seed);
+        in.close();
     }
-    Case() {
-        auto pair = ReadStageAndGen();
-        Stage = pair.first;
-        SetGen(pair.second);
-        User.SetGen(&Generator.Body);
-        Bot.SetGen(&Generator.Body);
-        ReadFromFile();
+
+    State(const size_t& stage,
+        const size_t& seed,
+        const std::string& sessionId) {
+        Stage = stage;
+        SessionId = sessionId;
+        Generator.Body.seed(seed);
     }
-    ~Case() {
-        SaveStageAndGen();
-        SaveToFile();
-    }
-    Player& GetUser() { return User; }
-    Player& GetBot() { return Bot; }
-    Tile GetPos() { return Position; }
-    std::mt19937& GetGen() { return Generator.Body; }
-    std::vector<Tile> GetPossible() {
-        return Possible;
-    }
-    std::vector<Tile> GetHits() {
-        return Hits;
-    }
-    void SetSequence(const std::pair<std::vector<Tile>, std::vector<Tile>>& seq) {
-        Possible = seq.first;
-        Hits = seq.second;
-    }
-    void SetStage(const stages& stage) { Stage = stage; }
-    void SetGen(const size_t& seed) {
-        std::mt19937 generator(seed);
-        Generator = { seed, generator };
-    }
-    void SetPos(const std::pair<size_t, size_t>& pos) { Position = pos; }
-    void SaveStageAndGen()
-    {
-        std::ofstream out(folder + "STAGE.txt");
-        out << Stage << std::endl;
-        out << Generator.Seed << std::endl;
+
+    ~State() {
+        std::ofstream out(SessionId + "STATE.txt");
+        if (out.is_open()) {
+            out << Stage << std::endl;
+            out << SessionId << std::endl;
+            out << Generator.Seed << std::endl;
+        }
         out.close();
     }
+
+    std::mt19937& Gen() { return Generator.Body; }
+
+    std::mt19937* GetGen() { return &Generator.Body; }
+
+    std::string GetSessionId() { return SessionId; }
+
+    void SetStage(const size_t& stage) { Stage = stage; }
+
+    size_t GetStage() { return Stage; }
+};
+
+class Case {
+private:
+    State* Core;
+public:
+    Player User;
+    Player Bot;
+    std::vector<Tile> Possible;
+    std::vector<Tile> Hits;
+    Tile Position;
+
+    Case(State* core,
+        const std::string& username) {
+        Core = core;
+        User.SetName(username);
+        User.SetGen(Core->GetGen());
+        Bot.SetName("Alice");
+        Bot.SetGen(Core->GetGen());
+        Bot.RandomScenario();
+    }
+
+    Case(State* core) {
+        Core = core;
+        ReadFromFile();
+    }
+
+    Case() {}
+
+    ~Case() {
+        SaveToFile();
+    }
+
     void SaveToFile() {
-        std::ofstream out(folder + "DATA.txt");
+        std::ofstream out(Core->GetSessionId() + "DATA.txt");
         if (out.is_open()) {
             out << User;
             out << Bot;
@@ -95,8 +129,9 @@ public:
         }
         out.close();
     }
+
     void ReadFromFile() {
-        std::ifstream in(folder + "DATA.txt");
+        std::ifstream in(Core->GetSessionId + "DATA.txt");
         if (in.is_open()) {
             in >> User;
             in >> Bot;

@@ -139,8 +139,7 @@ public:
     Player(const std::string& name) : Player(name, nullptr) {}
     Player() : Player("nan", nullptr) {} 
     ~Player() {}
-    Player& operator=(Player& player)
-    {
+    Player& operator=(Player& player) {
         Name = player.Name;
         Boards.Inner = player.Boards.Inner;
         Boards.Outer = player.Boards.Outer;
@@ -174,13 +173,16 @@ public:
         std::string result;
         while (letter < 'K') {
             result += letter;
+            result += ' ';
             ++letter;
         }
         result += '\n';
         for (const auto& i : Boards.Inner) {
             result += static_cast<char>('0' + number);
+            result += ' ';
             for (const auto& k : i) {
                 result += k;
+                result += ' ';
             }
             result += '\n';
             ++number;
@@ -193,13 +195,16 @@ public:
         std::string result;
         while (letter < 'K') {
             result += letter;
+            result += ' ';
             ++letter;
         }
         result += '\n';
         for (const auto& i : Boards.Outer) {
             result += static_cast<char>('0' + number);
+            result += ' ';
             for (const auto& k : i) {
                 result += k;
+                result += ' ';
             }
             result += '\n';
             ++number;
@@ -212,16 +217,20 @@ public:
         std::string result;
         while (letter < 'K') {
             result += letter;
+            result += ' ';
             ++letter;
         }
         result += '\n';
         for (size_t i = 0; i < Boards.Inner.size(); ++i) {
             result += static_cast<char>(number - '0');
+            result += ' ';
             for (size_t k = 0; k < Boards.Inner[i].size(); ++k) {
                 if (pos.first == i && pos.second == k) {
                     result += 'T';
+                    result += ' ';
                 } else {
                     result += Boards.Inner[i][k];
+                    result += ' ';
                 }
             }
             result += '\n';
