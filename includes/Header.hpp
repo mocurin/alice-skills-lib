@@ -131,7 +131,7 @@ public:
     }
 
     void ReadFromFile() {
-        std::ifstream in(Core->GetSessionId + "DATA.txt");
+        std::ifstream in(Core->GetSessionId() + "DATA.txt");
         if (in.is_open()) {
             in >> User;
             in >> Bot;
