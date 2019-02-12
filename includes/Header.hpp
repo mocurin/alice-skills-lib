@@ -31,8 +31,11 @@ public:
 
     State(const std::string& sessionId) {
         std::ifstream in(sessionId + "STATE.txt");
-        if (!in.is_open() || in.peek() == std::ifstream::traits_type::eof())
+        if (!in.is_open() || in.peek() == std::ifstream::traits_type::eof()) {
             InitiateBegin(sessionId);
+            in.close();
+            return;
+        }
         std::string tmp;
         getline(in, tmp);
         Stage = static_cast<stages>(std::stoul(tmp));
