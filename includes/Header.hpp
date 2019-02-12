@@ -8,13 +8,7 @@ enum stages { NAME, GREET, PLACEMENT, MANUAL, MANUAL1, MANUAL2, DECIDE1, DECIDE2
 std::string ChooseRandomString(std::mt19937& gen, const std::vector<std::string>& replics);
 std::string Cut(const std::string& str);
 Tile GetPos(const std::string& request);
-
-void ClearFiles(const std::string& sessionId) {
-    std::string tmp = sessionId + "STATE.txt";
-    std::remove(tmp.c_str());
-    tmp = sessionId + "DATA.txt";
-    std::remove(tmp.c_str());
-}
+void ClearFiles(const std::string& sessionId);
 
 class State {
 private:
