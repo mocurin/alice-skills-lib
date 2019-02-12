@@ -43,7 +43,7 @@ void BattleshipsCallback(const Alice::Request& request, Alice::Response& respons
         Alice::Button ButtonHard("Вручную", { "hard_method" }, true);
         response.PushButton(ButtonHard);
         Alice::Button ButtonEasy("Случайно", { "easy_method" }, true);
-        response.PushButton(ButtonE);
+        response.PushButton(ButtonEasy);
         core.SetStage(PLACEMENT);
         break;
     }
@@ -115,6 +115,7 @@ void BattleshipsCallback(const Alice::Request& request, Alice::Response& respons
         response.SetText(phrase);
         response.SetTts(phrase);
         core.SetStage(MANUAL1);
+		break;
     }
     case MANUAL1: {
         auto position = GetPos(request.Command());
@@ -589,7 +590,7 @@ void BattleshipsCallback(const Alice::Request& request, Alice::Response& respons
             });
         response.SetTts(phrase);
         response.SetText(phrase);
-        core.~core(); // файлы сохраняются в деструкторе. Необходим явный вызов, чтобы все-таки удалить файлы
+        core.~State(); // файлы сохраняются в деструкторе. Необходим явный вызов, чтобы все-таки удалить файлы
         ClearFiles(session.SessionId());
         response.SetEndSession(true);
         break;
