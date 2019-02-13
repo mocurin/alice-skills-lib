@@ -1,7 +1,8 @@
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.9)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 include("tools/gate/cmake/HunterGate.cmake")
 
@@ -11,7 +12,7 @@ HunterGate(
 )
 
 project(alice)
-string(APPEND CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused-command-line-argument -Wnon-virtual-dtor -pedantic")
+string(APPEND CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused-command-line-argument -Wnon-virtual-dtor -pedantic -pthread")
 
 hunter_add_package(GTest)
 find_package(GTest CONFIG REQUIRED)
@@ -33,13 +34,30 @@ add_executable(alice_tests
   source/Button.cpp
   source/Card.cpp
   source/ButtonPicture.cpp
+  source/Player.cpp
+  source/Functions.cpp
   tests/request_unittests.cpp
   tests/response_unittests.cpp
 )
 
+add_executable(websocket-chat-server
+  source/Request.cpp
+  source/Meta.cpp
+  source/Session.cpp
+  source/Response.cpp
+  source/Button.cpp
+  source/Card.cpp
+  source/ButtonPicture.cpp
+  source/Player.cpp
+  source/Functions.cpp
+  source/Source.cpp
+)
+
 target_include_directories(alice_tests PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/includes)
-target_link_libraries(alice_tests GTest::main nlohmann_json::nlohmann_json Boost::boost)
+target_include_directories(websocket-chat-server PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/includes)
+
+target_link_libraries(alice_tests GTest::main nlohmann_json::nlohmann_json Boost::boost Boost::system)
+target_link_libraries(websocket-chat-server nlohmann_json::nlohmann_json Boost::boost Boost::system)
 
 enable_testing()
 add_test(NAME tests COMMAND alice_tests)
-
