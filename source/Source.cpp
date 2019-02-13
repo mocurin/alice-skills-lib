@@ -5,7 +5,7 @@
 
 void BattleshipsCallback(const Alice::Request& request, Alice::Response& response) {
     const auto& session = request.Session();
-    if (!session.IsNew() && request.Command().empty()) {
+    if (!session.IsNew() && request.Command().empty() && request.RequestType() != Alice::Request::Type::ButtonPressed) {
         ClearFiles(session.SessionId());
         response.SetText("Пока!");
         response.SetTts("Пока!");
